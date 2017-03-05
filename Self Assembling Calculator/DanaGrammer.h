@@ -18,7 +18,7 @@ public:
 	DanaGrammer(std::string, std::vector<DanaVariable>);
 
 	//Public member functions
-	std::string nextLine(int, int);
+	std::string nextLine(int, int, std::string);
 private:
 
 	//Private member functions
