@@ -18,10 +18,22 @@ DanaGrammer::DanaGrammer(std::string requiredIterfaces, std::vector<DanaVariable
 
 /* --- Public member functions --- */
 
-std::string DanaGrammer::nextLine(int lineIndex, int maxLines) {	
+std::string DanaGrammer::nextLine(int lineIndex, int maxLines, std::string expectedReturnType) {	
 	//Check if last line
-	if (lineIndex == maxLines - 1) 
-		return "return " + availableVariables.at(availableVariables.size() -1).name;
+	if (lineIndex == maxLines - 1) {
+		const int last = availableVariables.size() - 1;
+		if (availableVariables.at(last).type == expectedReturnType)
+			return "return " + availableVariables.at(last).name;
+		else {
+			//Search for most recently declared variable of type : expectedReturnType
+			for (int i = last; i > -1; i--) {
+				if (availableVariables.at(i).type == expectedReturnType)
+					return "return " + availableVariables.at(i).name;
+			}
+
+			return "return " + availableVariables.at(last).name;
+		}
+	}
 		
 
 	//Check if any iterable variables exist in availableVariables
@@ -209,7 +221,7 @@ pairOfStrings DanaGrammer::assignFromArray() {
 
 	//Return result syntax and type
 	std::string type = newArrayAssign.type == "string" ? "char" : newArrayAssign.type;
-	std::string result = " " + newArrayAssign.name + " [ " + std::to_string(getRandomNumber(0, newArrayAssign.size - 1)) + " ] ";
+	std::string result = " " + newArrayAssign.name + " [ " + std::to_string(getRandomNumber(0, newArrayAssign.size - 1)) + " ]";
 	pairOfStrings pResult = std::make_pair(type, result);
 	return pResult;
 }
