@@ -172,7 +172,7 @@ std::string composeFunction(std::string outputPath, std::string requiredInterfac
 
 	//Loop until solution of correct length has be generated
 	for (int i = 0; i < solutionLength; i++) {
-		lines.push_back(functionGenerator.nextLine(i, solutionLength));
+		lines.push_back(functionGenerator.nextLine(i, solutionLength, "int"));
 	}
 
 	lines.push_back("}");
