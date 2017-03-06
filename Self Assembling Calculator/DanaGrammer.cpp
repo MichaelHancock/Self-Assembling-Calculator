@@ -221,7 +221,7 @@ pairOfStrings DanaGrammer::assignFromArray() {
 
 	//Return result syntax and type
 	std::string type = newArrayAssign.type == "string" ? "char" : newArrayAssign.type;
-	std::string result = " " + newArrayAssign.name + " [ " + std::to_string(getRandomNumber(0, newArrayAssign.size - 1)) + " ]";
+	std::string result = newArrayAssign.name + " [ " + std::to_string(getRandomNumber(0, newArrayAssign.size - 1)) + " ]";
 	pairOfStrings pResult = std::make_pair(type, result);
 	return pResult;
 }
