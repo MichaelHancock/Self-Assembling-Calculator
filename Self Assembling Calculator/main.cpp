@@ -76,6 +76,13 @@ int main() {
 		std::string nextTest = std::to_string(rand() % 10) + " + " + std::to_string(rand() % 10);
 		std::cout << "Result of  " << nextTest << ": " << testFunction(compilePath, nextTest) << std::endl;
 	}
+
+	//Store the list of failed attempts as a text file
+	std::string outputBuffer = "";
+	for (auto f : failedAttempts) {
+		outputBuffer += f + "\n";
+	}
+	writeDataFile(outputBuffer, "Resources/failedAttempts.txt");
 	
 	//Check if program should be run again
 	std::string runAgain = "";
