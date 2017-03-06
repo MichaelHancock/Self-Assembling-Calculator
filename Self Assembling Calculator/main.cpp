@@ -18,7 +18,8 @@ std::string composeFunction(std::string, std::string, int);
 std::string runSystemCommand(std::string);
 bool compileFunction(std::string);
 bool testFunction(std::string, std::string, std::string);
-int testFunction(std::string path, std::string test);
+int testFunction(std::string, std::string);
+void appendDataFile(std::string, std::string);
 
 int main() {
 	//Read input and target data
@@ -35,6 +36,8 @@ int main() {
 	const std::string outputPath = "Resources/calculator.dn";
 	const std::string compilePath = "Resources/calculator.o";
 	std::set<std::string> failedAttempts;
+	std::string function;
+	int countOfDuplicates = 0;
 	bool complete = false;
 	bool didCompile = false;
 	bool solutionFound = false;
@@ -44,7 +47,7 @@ int main() {
 
 	while (!complete) {
 		//Generate code
-		const std::string function = composeFunction(outputPath, requires, 6);
+		function = composeFunction(outputPath, requires, 6);
 		const std::set<std::string>::iterator it = failedAttempts.find(function);
 
 		//Check that composed function has not been tried before
@@ -59,6 +62,8 @@ int main() {
 			//End loop if solution is found
 			complete = solutionFound;
 		}
+		else
+			countOfDuplicates++;
 	}
 
 	//Calculate time taken to run 
@@ -83,7 +88,15 @@ int main() {
 		outputBuffer += f + "\n";
 	}
 	writeDataFile(outputBuffer, "Resources/failedAttempts.txt");
-	
+
+	//Store output of process as a text file 
+	std::string processOutput = "\n";
+	processOutput += "Time taken: " + std::to_string(elapsed_secs) + " CPU seconds\n";
+	processOutput += "Number of failed attempts: " + std::to_string(failedAttempts.size() + countOfDuplicates) + "\n";
+	processOutput += "Number of duplicates: " + std::to_string(countOfDuplicates) + "\n";
+	processOutput += function;
+	appendDataFile(processOutput, "Resources/diagnostics.txt");
+
 	//Check if program should be run again
 	std::string runAgain = "";
 	std::cout << "\Run again (y/n)?  ";
@@ -139,6 +152,14 @@ void writeDataFile(std::string toWrite, std::string path) {
 	generatedFile.close();
 }
 
+void appendDataFile(std::string toWrite, std::string path) {
+	//Append string to file
+	std::ofstream outfile;
+	outfile.open(path, std::ios_base::app);
+	outfile << toWrite;
+	outfile.close();
+}
+
 std::string getRequiredInterfaces() {
 	//Get all required interfaces for Dana program
 	std::string requires = "";
@@ -174,15 +195,15 @@ std::string composeFunction(std::string outputPath, std::string requiredInterfac
 	
 	//Generate code to find solution to target txt file
 	std::vector<std::string> lines = {"component provides App requires" + requiredInterfaces + " {"};
-	lines.push_back("int App:main(AppParam params[]) {");
-	lines.push_back("char a[] = params[0].string");
+	lines.push_back("\tint App:main(AppParam params[]) {");
+	lines.push_back("\t\tchar a[] = params[0].string");
 
 	//Loop until solution of correct length has be generated
 	for (int i = 0; i < solutionLength; i++) {
-		lines.push_back(functionGenerator.nextLine(i, solutionLength, "int"));
+		lines.push_back("\t\t" + functionGenerator.nextLine(i, solutionLength, "int"));
 	}
 
-	lines.push_back("}");
+	lines.push_back("\t}");
 	lines.push_back("}");
 
 	//Collapse vector into string, append line spaces to lines of code
