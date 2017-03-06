@@ -57,3 +57,93 @@ component provides App requires Adder adder, data.IntUtil uInt {
 		return gen5
 	}
 }
+
+Time taken: 166.607000 CPU seconds
+Number of failed attempts: 93040
+Number of duplicates: 92887
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 0 ]
+		char gen2 = a [ 4 ]
+		int gen3 = uInt.intFromString ( gen1 )
+		int gen4 = uInt.intFromString ( gen2 )
+		int gen5 = adder.add ( gen4, gen3 )
+		return gen5
+	}
+}
+
+Time taken: 117.084000 CPU seconds
+Number of failed attempts: 62973
+Number of duplicates: 62869
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 0 ]
+		int gen2 = uInt.intFromString ( gen1 )
+		char gen3 = a [ 4 ]
+		int gen4 = uInt.intFromString ( gen3 )
+		int gen5 = adder.add ( gen2, gen4 )
+		return gen5
+	}
+}
+
+Time taken: 814.373000 CPU seconds
+Number of failed attempts: 484830
+Number of duplicates: 484226
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 4 ]
+		char gen2 = a [ 0 ]
+		int gen3 = uInt.intFromString ( gen2 )
+		int gen4 = uInt.intFromString ( gen1 )
+		int gen5 = adder.add ( gen4, gen3 )
+		return gen5
+	}
+}
+
+Time taken: 1843.032000 CPU seconds
+Number of failed attempts: 1072670
+Number of duplicates: 1071504
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 0 ]
+		char gen2 = a [ 4 ]
+		int gen3 = uInt.intFromString ( gen1 )
+		int gen4 = uInt.intFromString ( gen2 )
+		int gen5 = adder.add ( gen3, gen4 )
+		return gen5
+	}
+}
+
+Time taken: 1157.442000 CPU seconds
+Number of failed attempts: 693076
+Number of duplicates: 692281
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 4 ]
+		int gen2 = uInt.intFromString ( gen1 )
+		char gen3 = a [ 0 ]
+		int gen4 = uInt.intFromString ( gen3 )
+		int gen5 = adder.add ( gen4, gen2 )
+		return gen5
+	}
+}
+
+Time taken: 188.730000 CPU seconds
+Number of failed attempts: 102661
+Number of duplicates: 102494
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		char gen1 = a [ 0 ]
+		int gen2 = uInt.intFromString ( gen1 )
+		char gen3 = a [ 4 ]
+		int gen4 = uInt.intFromString ( gen3 )
+		int gen5 = adder.add ( gen4, gen2 )
+		return gen5
+	}
+}
