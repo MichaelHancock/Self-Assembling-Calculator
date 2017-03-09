@@ -14,7 +14,7 @@
 #include "DanaVariable.h"
 
 //Function prototypes
-void runGenerationLoop(std::string);
+void runGenerationLoop(std::string, std::string);
 void marshallFunctionsSet(std::string, std::string);
 std::string readDataFile(std::string);
 void writeDataFile(std::string, std::string);
@@ -26,10 +26,16 @@ bool testFunction(std::string, std::string, std::string);
 int testFunction(std::string, std::string);
 void appendDataFile(std::string, std::string);
 
+//Constants 
+const std::string PUSH = "PUSH";
+const std::string POP = "POP";
+
 //State variables
 std::set<std::string> functions;
+std::set<std::string> attemptedFunctions;
+int numberOfDuplicates = 0;
 std::string resultFunction = "";
-std::mutex vectorGate;
+std::mutex functionGate;
 
 int main() {
 	//Read input and target data
@@ -47,13 +53,12 @@ int main() {
 	const std::string compilePath = "Resources/calculator.o";
 	std::set<std::string> failedAttempts;
 	std::string function;
-	int countOfDuplicates = 0;
 	bool complete = false;
 	bool didCompile = false;
 	bool solutionFound = false;
 
 	//Start thread to generate new functions
-	std::thread generationLoop(runGenerationLoop, requires);
+	std::thread generationLoop(runGenerationLoop, requires, outputPath);
 	clock_t begin = clock();
 
 	while (resultFunction.length() == 0) {
@@ -64,34 +69,21 @@ int main() {
 			function = *iF;
 			writeDataFile(function, outputPath);
 
-			const std::set<std::string>::iterator it = failedAttempts.find(function);
+			//Compile code 
+			if (compileFunction(outputPath))
+				solutionFound = testFunction(compilePath, input, target);
 
-			//Check that composed function has not been tried before
-			if (it == failedAttempts.end()) {
-				//Compile code 
-				if (compileFunction(outputPath))
-					solutionFound = testFunction(compilePath, input, target);
-
-				if (solutionFound) {
-					resultFunction = function;
-					generationLoop.join();
-				}
-				else {
-					failedAttempts.insert(function);
-					marshallFunctionsSet("POP", function);
-				}
-
-				//End loop if solution is found
-				complete = solutionFound;
+			if (solutionFound) {
+				resultFunction = function;
+				generationLoop.join();
 			}
 			else {
-				marshallFunctionsSet("POP", function);
-				countOfDuplicates++;
+				failedAttempts.insert(function);
+				marshallFunctionsSet(POP, function);
 			}
-		}
-		else {
-			//Sleep thread while functions are being generated 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+
+			//End loop if solution is found
+			complete = solutionFound;
 		}
 	}
 
@@ -102,6 +94,7 @@ int main() {
 	//Output result to console
 	std::cout << "\n\nFunction generated successfully in " << elapsed_secs << " CPU seconds" << std::endl;
 	std::cout << "Number of failed attempts: " << failedAttempts.size() << std::endl;
+	std::cout << "Number of duplicates generated: " << numberOfDuplicates << std::endl;
 	std::cout << "Result of  " << input << ": " << testFunction(compilePath, input) << std::endl;
 	
 	//Output general solution result
@@ -121,8 +114,8 @@ int main() {
 	//Store output of process as a text file 
 	std::string processOutput = "\n";
 	processOutput += "Time taken: " + std::to_string(elapsed_secs) + " CPU seconds\n";
-	processOutput += "Number of failed attempts: " + std::to_string(failedAttempts.size() + countOfDuplicates) + "\n";
-	processOutput += "Number of duplicates: " + std::to_string(countOfDuplicates) + "\n";
+	processOutput += "Number of failed attempts: " + std::to_string(failedAttempts.size()) + "\n";
+	processOutput += "Number of duplicates generated: " + std::to_string(numberOfDuplicates) + "\n";
 	processOutput += function;
 	appendDataFile(processOutput, "Resources/diagnostics.txt");
 
@@ -133,34 +126,39 @@ int main() {
 	if (runAgain == "Y" || runAgain == "y" || runAgain == "yes") {
 		std::cout << "\n-------------------------------------\n" << std::endl;
 		functions.clear();
+		attemptedFunctions.erase(resultFunction);
 		resultFunction = "";
+		numberOfDuplicates = 0;
 		main();
 	}
 
 	return 0;
 }
 
-void runGenerationLoop(std::string requires) {
-	//Generate functions and store in functions vector 
-	const std::string outputPath = "Resources/calculator.dn";
+void runGenerationLoop(std::string requires, std::string outputPath) {
+	//Generate functions and store in functions vector
 
-	//Generate up to 100 functions at a time
-	while (resultFunction.length() == 0) {
-		if (functions.size() < 100)
-			marshallFunctionsSet("PUSH", composeFunction(outputPath, requires, 6, false));
-		else 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+	while (resultFunction.length() == 0) {			
+		//Generate new function and check it is unique before adding to functions set
+		const std::string newFunction = composeFunction(outputPath, requires, 6, false);
+		const int sizeBeforeInsert = attemptedFunctions.size();
+		attemptedFunctions.insert(newFunction);
+		const int sizeAfterInsert = attemptedFunctions.size();
+		if (sizeAfterInsert > sizeBeforeInsert)
+			marshallFunctionsSet(PUSH, newFunction);
+		else
+			numberOfDuplicates++;
 	}
 }
 
 void marshallFunctionsSet(std::string command, std::string pushParam) {
 	//Ensure only one thread can manipulate the set at a time
-	vectorGate.lock();
-	if (command == "PUSH")
+	functionGate.lock();
+	if (command == PUSH)
 		functions.insert(pushParam);
-	else if (command == "POP" && functions.size() > 0)
+	else if (command == POP && functions.size() > 0)
 		functions.erase(pushParam);
-	vectorGate.unlock();
+	functionGate.unlock();
 }
 
 std::string readDataFile(std::string errorMessage) {
