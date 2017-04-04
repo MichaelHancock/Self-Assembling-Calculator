@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 /* --- Class to store type and name information for a Dana variable --- */
 
