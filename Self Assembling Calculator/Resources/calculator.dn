@@ -1,11 +1,5 @@
 component provides App requires Adder adder, data.IntUtil uInt {
 	int App:main(AppParam params[]) {
 		char a[] = params[0].string
-		char gen1 = a [ 0 ]
-		int gen2 = uInt.intFromString ( gen1 )
-		char gen3 = a [ 4 ]
-		int gen4 = uInt.intFromString ( gen3 )
-		int gen5 = adder.add ( gen4, gen2 )
-		return gen5
 	}
 }
