@@ -19,7 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{795D96C1-40C2-4405-BCFC-6FE6F1AAC2EC}</ProjectGuid>
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{3B54BCB8-86C5-4623-8E3E-59FA96FBE998}</ProjectGuid>
     <RootNamespace>SelfAssemblingCalculator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
