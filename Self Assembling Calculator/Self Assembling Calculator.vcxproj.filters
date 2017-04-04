@@ -29,5 +29,8 @@
     <ClInclude Include="DanaGrammer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DanaFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

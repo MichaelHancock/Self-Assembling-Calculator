@@ -9,6 +9,9 @@ public:
 	std::string type;
 	int size;
 
+	DanaVariable() {
+	}
+
 	DanaVariable(std::string variableName, std::string variableType) {
 		name = variableName;
 		type = variableType;
