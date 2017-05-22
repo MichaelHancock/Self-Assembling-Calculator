@@ -22,10 +22,14 @@ public:
 	}
 
 	DanaFunction(DanaVariable danaArray) {
-		returnType = danaArray.type;
 		parameters = { "int" };
 		isArrayAssign = true;
 		functionObject = danaArray;
+
+		if (danaArray.type == "string")
+			returnType = "char";
+		else
+			returnType = danaArray.type;
 	}
 
 	std::string getParameter(int index) {

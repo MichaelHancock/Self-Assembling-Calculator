@@ -1,5 +1,7 @@
 component provides App requires Adder adder, data.IntUtil uInt {
 	int App:main(AppParam params[]) {
 		char a[] = params[0].string
+		char b = a [ 4 ]
+		return b
 	}
 }
