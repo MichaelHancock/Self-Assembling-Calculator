@@ -118,6 +118,7 @@
     <ClInclude Include="DanaFunction.h" />
     <ClInclude Include="DanaGrammer.h" />
     <ClInclude Include="DanaVariable.h" />
+    <ClInclude Include="LineStore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

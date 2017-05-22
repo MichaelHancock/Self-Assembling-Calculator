@@ -1,0 +1,24 @@
+
+Time taken: 0.095000 CPU seconds
+component provides App requires Adder ad {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		return 0
+	}
+}
+
+Time taken: 0.053000 CPU seconds
+component provides App requires resou r {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		return 0
+	}
+}
+
+Time taken: 25.374000 CPU seconds
+component provides App requires add e {
+	int App:main(AppParam params[]) {
+		char a[] = params[0].string
+		return 0
+	}
+}

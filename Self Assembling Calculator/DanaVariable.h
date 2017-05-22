@@ -8,6 +8,7 @@ public:
 	std::string name;
 	std::string type;
 	int size;
+	int value;
 
 	DanaVariable() {
 	}
@@ -16,14 +17,20 @@ public:
 		name = variableName;
 		type = variableType;
 		size = NULL;
+		value = NULL;
 	}
 
 	DanaVariable(std::string variableName, std::string variableType, int variableSize) {
 		name = variableName;
 		type = variableType;
+		value = NULL;
 
 		if (variableSize > 0)
 			size = variableSize;
+	}
+
+	bool DanaVariable::operator==(const DanaVariable& dv) {
+		return name == dv.name && type == dv.type;
 	}
 };
 
