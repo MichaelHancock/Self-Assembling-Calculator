@@ -35,5 +35,8 @@
     <ClInclude Include="LineStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Assembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

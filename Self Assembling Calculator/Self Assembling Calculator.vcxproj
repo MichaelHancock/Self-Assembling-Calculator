@@ -115,6 +115,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assembler.h" />
     <ClInclude Include="DanaFunction.h" />
     <ClInclude Include="DanaGrammer.h" />
     <ClInclude Include="DanaVariable.h" />
