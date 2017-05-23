@@ -1,10 +1,11 @@
 #include "DanaGrammer.h"
 
+/* --- Public Member Functions --- */
+
 DanaGrammer::DanaGrammer(std::string required, ListOfVariables variables) {
 	//	Initialise local memory
 	knownFunctions = ListOfFunctions();
 	knownVariables = ListOfVariables();
-	generatedFunctions = ListOfStrings();
 	functionHeader = ListOfStrings();
 
 	//	Add passed variables into local list of known variables
@@ -25,33 +26,40 @@ DanaGrammer::DanaGrammer(std::string required, ListOfVariables variables) {
 	functionHeader.push_back("component provides App requires" + required + " {");
 	functionHeader.push_back("\tint App:main(AppParam params[]) {");
 	store.addNewListOfLines({ "char a[] = params[0].string" });
+	numberOfGeneratedLines = 1;
 }
 
-ListOfStrings DanaGrammer::generateAllFunctonInstances(int numberOfLines) {
+ListOfStrings DanaGrammer::generateAllFunctonInstances() {
+	ListOfStrings potentialLines = getAllPossibleLines(knownFunctions, knownVariables, numberOfGeneratedLines + 1);
+	std::vector<std::pair<int, int>> iterators;
+
+	//	Add generated lines to store and output generated functions
+	store.addNewListOfLines(potentialLines);
+	numberOfGeneratedLines++;
+	std::string variableToReturn = getVariableName(numberOfGeneratedLines);
+	
+	Assembler asmb = Assembler(store, functionHeader);
+	return asmb.make();
+}
+
+/* --- Private Member Functions --- */
+
+ListOfStrings DanaGrammer::getAllPossibleLines(ListOfFunctions availableFunctions, ListOfVariables availableVariables, int lineIndex) {
 	ListOfStrings lines = functionHeader;
 	ListOfStrings potentialLines = {};
-	int currentLineNumber = 2;
-
-	//	Return only hardcoded elements if less than 2 lines
-	if (numberOfLines < 2) {
-		lines.push_back("\t\treturn 0");
-		lines.push_back("\t}");
-		lines.push_back("}");
-
-		return { { collpaseVector(lines) } };
-	}
+	int currentLineNumber = lineIndex;
 
 	//	Iterate through available functions
-	for (int i = 0; i < knownFunctions.size(); i++) {
-		DanaFunction currentFunction = knownFunctions.at(i);
+	for (int i = 0; i < availableFunctions.size(); i++) {
+		DanaFunction currentFunction = availableFunctions.at(i);
 		ListOfVariables matchedParams = {};
-		
+
 		//	Find variables which match the currentFunction parameters  
 		for (int j = 0; j < currentFunction.numberOfParameters(); j++) {
 			const std::string currentParam = currentFunction.getParameter(j);
 
-			for (int k = 0; k < knownVariables.size(); k++) {
-				DanaVariable currentVariable = knownVariables.at(k);
+			for (int k = 0; k < availableVariables.size(); k++) {
+				DanaVariable currentVariable = availableVariables.at(k);
 
 				if (!currentFunction.isArrayAssign && currentVariable.type == currentParam) {
 					//	If currentVariable matches one of the currentFunction parameters, add it to matched params
@@ -109,39 +117,10 @@ ListOfStrings DanaGrammer::generateAllFunctonInstances(int numberOfLines) {
 		}
 	}
 
-	//	Add generated lines to store and output generated functions
-	store.addNewListOfLines(potentialLines);
-	std::string variableToReturn = getVariableName(currentLineNumber);
-	currentLineNumber++;
-	for (int i = 0; i < store.getList(0).size(); i++) {
-		for (int j = 0; j < store.getList(1).size(); j++) {
-			ListOfStrings output = functionHeader;
-			output.push_back("\t\t" + store.getList(0).at(i));
-			output.push_back("\t\t" + store.getList(1).at(j));
-			output.push_back("\t\treturn " + variableToReturn);
-			output.push_back("\t}");
-			output.push_back("}");
-
-			generatedFunctions.push_back(collpaseVector(output));
-		}
-	}
-
-	return generatedFunctions;
+	return potentialLines;
 }
 
 std::string DanaGrammer::getVariableName(int lineNumber) {
 	assert(lineNumber >= 1 && lineNumber <= 26);
-		return std::string(1, "abcdefghijklmnopqrstuvwxyz"[lineNumber - 1]);
+	return std::string(1, "abcdefghijklmnopqrstuvwxyz"[lineNumber - 1]);
 }
-
-std::string DanaGrammer::collpaseVector(ListOfStrings lines) {
-	std::string result = "";
-
-	//	Collapse vector into string, add lines spaces
-	for (int i = 0; i < lines.size(); i++) {
-		result += lines.at(i) + "\n";
-	}
-
-	return result;
-}
-

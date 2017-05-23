@@ -1,11 +1,12 @@
 #pragma once
-#include <vector>
+#include <algorithm>
 #include <assert.h>   
 #include <string>
-#include <algorithm>
+#include <vector>
+#include "Assembler.h"
+#include "LineStore.h"
 #include "DanaVariable.h"
 #include "DanaFunction.h"
-#include "LineStore.h"
 
 typedef std::vector<DanaFunction> ListOfFunctions;
 typedef std::vector<DanaVariable> ListOfVariables;
@@ -13,15 +14,19 @@ typedef std::vector<std::string> ListOfStrings;
 
 class DanaGrammer {
 private: 
+	//	Private member variables
 	ListOfFunctions knownFunctions;
 	ListOfVariables knownVariables;
-	ListOfStrings generatedFunctions;
 	ListOfStrings functionHeader;
 	LineStore store;
-	std::string collpaseVector(ListOfStrings lines);
-	std::string getVariableName(int lineNumber);
+	int numberOfGeneratedLines;
+
+	//	Private member functions
+	ListOfStrings getAllPossibleLines(ListOfFunctions, ListOfVariables, int);
+	std::string getVariableName(int);
 
 public:
-	DanaGrammer(std::string required, ListOfVariables knownVariables);
-	ListOfStrings generateAllFunctonInstances(int numberOfLines);
+	//	Public member functions
+	DanaGrammer(std::string, ListOfVariables);
+	ListOfStrings generateAllFunctonInstances();
 };

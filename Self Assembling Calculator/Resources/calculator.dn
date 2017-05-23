@@ -2,6 +2,10 @@ component provides App requires Adder adder, data.IntUtil uInt {
 	int App:main(AppParam params[]) {
 		char a[] = params[0].string
 		char b = a [ 4 ]
-		return b
+		char c = a [ 4 ]
+		char d = a [ 4 ]
+		char e = a [ 4 ]
+		char f = a [ 4 ]
+		return f
 	}
 }
