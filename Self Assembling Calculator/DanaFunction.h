@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "DanaVariable.h"
 
 /* --- Class to store return type, name and parameter information for a Dana function --- */
 
@@ -40,4 +41,3 @@ public:
 		return parameters.size();
 	}
 };
-
