@@ -30,6 +30,31 @@ DanaGrammer::DanaGrammer(std::string required, ListOfVariables variables) {
 }
 
 ListOfStrings DanaGrammer::generateAllFunctonInstances() {
+	knownVariables.clear();
+	for (int i = 0; i < store.size(); i++) {
+		DanaVariable var;
+		ListOfStrings line = {};
+
+		for (int j = 0; j < store.getList(i).size(); j++) {
+			line = split(store.getList(i).at(j));
+			if (validateVariable(line)) {
+				break;
+			}
+		}
+
+		if (line.at(1).size() > 1 && line.at(1).at(1) == '[') {
+			line.at(1).pop_back();
+			line.at(1).pop_back();
+			var = DanaVariable(line.at(1), line.at(0) == "char" ? "string" : line.at(0), 5);
+		}
+		else {
+			var = DanaVariable(line.at(1), line.at(0));
+		}
+
+		
+		knownVariables.push_back(var);
+	}
+
 	ListOfStrings potentialLines = getAllPossibleLines(knownFunctions, knownVariables, numberOfGeneratedLines + 1);
 	std::vector<std::pair<int, int>> iterators;
 
@@ -120,7 +145,57 @@ ListOfStrings DanaGrammer::getAllPossibleLines(ListOfFunctions availableFunction
 	return potentialLines;
 }
 
+bool DanaGrammer::validateVariable(ListOfStrings line) {
+	if (line.size() > 4 && line.at(4) == "(") {
+		for (int j = 0; j < knownFunctions.size(); j++) {
+			if (knownFunctions.at(j).name == line.at(3)) {
+				int numberOfParamMatches = 0;
+				DanaFunction current = knownFunctions.at(j);
+				ListOfStrings params = {};
+				for (int l = 4; l < line.size(); l++) {
+					if (line.at(l) != "," && line.at(l) != "(" && line.at(l) != ")") {
+						params.push_back(line.at(l));
+					}
+				}
+
+				for (int l = 0; l < knownVariables.size(); l++) {
+					for (int m = 0; m < params.size(); m++) {
+						if (knownVariables.at(l).name == params.at(m)) {
+							DanaVariable currentVariable = knownVariables.at(l);
+
+							for (int n = 0; n < current.numberOfParameters(); n++) {
+								if (currentVariable.type == current.getParameter(n)) {
+									numberOfParamMatches++;
+								}
+							}
+						}
+					}
+				}
+
+				if (numberOfParamMatches == current.numberOfParameters()) 
+					return true;
+				else 
+					return false;
+			}
+		}
+	}
+
+	else 
+		return true;
+}
+
 std::string DanaGrammer::getVariableName(int lineNumber) {
 	assert(lineNumber >= 1 && lineNumber <= 26);
 	return std::string(1, "abcdefghijklmnopqrstuvwxyz"[lineNumber - 1]);
+}
+
+ListOfStrings DanaGrammer::split(std::string str) {
+	std::string buffer; 
+	std::stringstream ss(str); 
+	ListOfStrings tokens; 
+
+	while (ss >> buffer)
+		tokens.push_back(buffer);
+
+	return tokens;
 }
