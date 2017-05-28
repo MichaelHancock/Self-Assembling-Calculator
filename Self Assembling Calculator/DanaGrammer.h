@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <assert.h>   
 #include <string>
+#include <sstream>
 #include <vector>
 #include "Assembler.h"
 #include "LineStore.h"
@@ -23,7 +24,9 @@ private:
 
 	//	Private member functions
 	ListOfStrings getAllPossibleLines(ListOfFunctions, ListOfVariables, int);
+	bool validateVariable(ListOfStrings);
 	std::string getVariableName(int);
+	ListOfStrings split(std::string);
 
 public:
 	//	Public member functions
