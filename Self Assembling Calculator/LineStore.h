@@ -28,8 +28,20 @@ public:
 		store.erase(store.begin() + index);
 	}
 
+	void clear() {
+		for (int i = 0; i < store.size(); i++) {
+			store.at(i).clear();
+		}
+
+		store.clear();
+	}
+
 	int size() {
 		return store.size();
+	}
+
+	~LineStore() {
+		clear();
 	}
 };
 

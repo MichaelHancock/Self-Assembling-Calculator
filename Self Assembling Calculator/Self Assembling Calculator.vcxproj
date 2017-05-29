@@ -111,6 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Assembler.cpp" />
     <ClCompile Include="DanaGrammer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
