@@ -81,6 +81,8 @@ int main() {
 
 			countSinceLastOutput++;
 		}
+
+		functions.clear();
 	}
 
 	//Calculate time taken to run 
