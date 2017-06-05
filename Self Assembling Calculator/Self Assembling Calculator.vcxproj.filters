@@ -21,9 +21,6 @@
     <ClCompile Include="DanaGrammer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Assembler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DanaVariable.h">
@@ -35,10 +32,10 @@
     <ClInclude Include="DanaFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LineStore.h">
+    <ClInclude Include="DanaLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Assembler.h">
+    <ClInclude Include="DanaLineSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
