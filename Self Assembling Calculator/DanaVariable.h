@@ -4,29 +4,49 @@
 /* --- Class to store type and name information for a Dana variable --- */
 
 class DanaVariable {
+private:
+	bool array;
+	int arraySize;
+	std::string value = "";
+
 public:
 	std::string name;
 	std::string type;
-	int size;
-	int value;
 
-	DanaVariable() {
-	}
+	DanaVariable() {}
 
 	DanaVariable(std::string variableName, std::string variableType) {
 		name = variableName;
 		type = variableType;
-		size = NULL;
-		value = NULL;
+		array = false;
+		arraySize = NULL;
 	}
 
-	DanaVariable(std::string variableName, std::string variableType, int variableSize) {
+	DanaVariable(std::string variableName, std::string variableType, int sizeOfArray) {
 		name = variableName;
 		type = variableType;
-		value = NULL;
+		arraySize = sizeOfArray;
+		array = true;
+	}
 
-		if (variableSize > 0)
-			size = variableSize;
+	void setValue(std::string newValue) {
+		value = newValue;
+	}
+
+	std::string getValue() {
+		return value;
+	}
+
+	std::string composeVariable() {
+		return type + " " + name;
+	}
+
+	int size() {
+		return arraySize;
+	}
+
+	bool isArray() {
+		return array;
 	}
 
 	bool DanaVariable::operator==(const DanaVariable& dv) {
