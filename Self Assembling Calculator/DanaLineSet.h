@@ -106,7 +106,7 @@ public:
 
 			for (auto j : parametersUsed) {
 				if (!(std::find(currentlyInScope.begin(), currentlyInScope.end(), j) 
-					!= currentlyInScope.end())) {
+					!= currentlyInScope.end()) && j.getValue() == "") {
 					linesAreValid = false;
 				}
 			}
