@@ -10,6 +10,8 @@ class DanaFunction {
 private:
 	std::vector<std::string> requiredParams;
 	std::vector<DanaVariable> matchedParams;
+	std::string assignmentModifier;
+	DanaVariable functionObject;
 	bool arrayAssign;
 
 public:
@@ -32,11 +34,21 @@ public:
 		requiredParams = { "int" };
 		matchedParams = { DanaVariable() };
 		arrayAssign = true;
+		functionObject = danaArray;
 
 		if (danaArray.type == "string")
 			returnType = "char";
 		else
 			returnType = danaArray.type;
+	}
+
+	DanaFunction(DanaVariable danaArray, std::string modifier){
+		requiredParams = { "int" };
+		matchedParams = { DanaVariable() };
+		arrayAssign = true;
+		assignmentModifier = "." + modifier;
+		returnType = danaArray.type;
+		functionObject = danaArray;
 	}
 
 	DanaVariable getMatchedParameter(int index) {
@@ -69,7 +81,7 @@ public:
 		if (isArrayAssign()) {
 			std::string paramValue = matchedParams.at(0).getValue();
 			std::string outVal = paramValue.size() > 0 ? paramValue : matchedParams.at(0).name;
-			return "[ " + outVal + " ]";
+			return functionObject.name + " [ " + outVal + " ]" + assignmentModifier;
 		}
 
 		std::string call = name + " ( ";
@@ -93,5 +105,10 @@ public:
 
 	bool operator==(const DanaFunction& df) {
 		return (name == df.name && returnType == df.returnType && arrayAssign == df.arrayAssign);
+	}
+
+	~DanaFunction() {
+		matchedParams.clear();
+		requiredParams.clear();
 	}
 };
