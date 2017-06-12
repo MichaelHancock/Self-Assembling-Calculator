@@ -22,6 +22,14 @@ public:
 		arraySize = NULL;
 	}
 
+	DanaVariable(std::string variableName, std::string variableType, std::string storedValue) {
+		name = variableName;
+		type = variableType;
+		array = false;
+		arraySize = NULL;
+		value = storedValue;
+	}
+
 	DanaVariable(std::string variableName, std::string variableType, int sizeOfArray) {
 		name = variableName;
 		type = variableType;
@@ -38,6 +46,9 @@ public:
 	}
 
 	std::string composeVariable() {
+		if (array)
+			return type + " " + name + " [] ";
+
 		return type + " " + name;
 	}
 
