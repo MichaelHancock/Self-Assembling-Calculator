@@ -19,7 +19,6 @@ class DanaGrammer {
 private: 
 	//	Private member variables
 	ListOfFunctions knownFunctions;
-	ListOfVariables knownVariables;
 	ListOfStrings functionHeader;
 	LineStore store;
 

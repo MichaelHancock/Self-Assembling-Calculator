@@ -11,9 +11,8 @@ DanaGrammer::DanaGrammer(std::string required, ListOfFunctions newFunctions, Dan
 
 	//	Initialise known functions
 	knownFunctions = newFunctions;
-	if (primaryLine.getDeclaredVariable().isArray()) {
+	if (primaryLine.getDeclaredVariable().isArray()) 
 		knownFunctions.push_back(DanaFunction(primaryLine.getDeclaredVariable()));
-	}
 	
 	//	Compose function header - including required functions
 	functionHeader.push_back("component provides App requires" + required + " {");
@@ -21,24 +20,30 @@ DanaGrammer::DanaGrammer(std::string required, ListOfFunctions newFunctions, Dan
 }
 
 ListOfStrings DanaGrammer::generateAllFunctonInstances() {
-	int currentLineNumber = store.size() + 1;
+	const int currentLineNumber = store.size() + 1;
+	ListOfVariables knownVariables = {};
 	ListOfLines potentialLines = {};
 	Assembler asmb1 = Assembler(store);
 	std::vector<DanaLineSet> lineVariations = asmb1.makeOnlyLines();
 	std::vector<std::string> attempts = {};
 
-	knownVariables.clear();
+	//	Iterate through previous line combinations - Then generate next line
 	for (auto lineSet : lineVariations) {
-		for (int line = 0; line < lineSet.numberOfLines(); line++) {
-			knownVariables.push_back(lineSet.getLine(line).getDeclaredVariable());
-		}
 
+		//	Populate knownVariables from declared vars on previous lines
+		for (int line = 0; line < lineSet.numberOfLines(); line++) 
+			knownVariables.push_back(lineSet.getLine(line).getDeclaredVariable());
+		
+		//	Record knownVariables combination
 		std::string newAttempt = "";
 		for (auto var : knownVariables) 
 			newAttempt += var.composeVariable() + "\n";
 
+		//	Check variable combination has not been tried before
 		if (!(std::find(attempts.begin(), attempts.end(), newAttempt) != attempts.end())) {
 			attempts.push_back(newAttempt);
+
+			//	Generate next line using current knownVariables
 			ListOfLines newLines = getAllLineVariations(currentLineNumber, knownVariables);
 			potentialLines.insert(potentialLines.end(), newLines.begin(), newLines.end());
 			newLines.clear();
@@ -47,9 +52,12 @@ ListOfStrings DanaGrammer::generateAllFunctonInstances() {
 		knownVariables.clear();
 	}
 
-	//	Add the new lines to the store 
+	//	Add the new lines to the store - Clear local memory used for generation
 	store.addLines(potentialLines);
+	lineVariations.clear();
 	potentialLines.clear();
+	knownVariables.clear();
+	attempts.clear();
 
 	//	Assemble all possible variations of the store
 	Assembler asmb = Assembler(store, functionHeader);
