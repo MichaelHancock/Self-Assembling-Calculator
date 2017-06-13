@@ -13,7 +13,7 @@ public:
 	DanaLineSet() {}
 
 	int numberOfLines() {
-		return lines.size();
+		return (int)lines.size();
 	}
 
 	void insertLine(DanaLine newLine) {

@@ -34,7 +34,7 @@ public:
 	}
 
 	int size() {
-		return store.size();
+		return (int)store.size();
 	}
 
 	~LineStore() {
