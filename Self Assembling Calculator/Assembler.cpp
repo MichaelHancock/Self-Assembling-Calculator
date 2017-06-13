@@ -40,7 +40,7 @@ ListOfStrings Assembler::makeFunctions() {
 		newOutput.clear();
 
 		//	Increment values of iter - used to compose above lines
-		for (int i = iter.size() - 1; i > -1; i--) {
+		for (int i = (int)(iter.size() - 1); i > -1; i--) {
 			if (iter.at(i).first < iter.at(i).second - 1) {
 				iter.at(i).first++;
 				break;
@@ -97,7 +97,7 @@ std::vector<DanaLineSet> Assembler::makeOnlyLines() {
 			return generatedFunctions;
 
 		//	Increment values of iter - used to compose above lines
-		for (int i = iter.size() - 1; i > -1; i--) {
+		for (int i = (int)(iter.size() - 1); i > -1; i--) {
 			if (iter.at(i).first < iter.at(i).second - 1) {
 				iter.at(i).first++;
 				break;
@@ -142,7 +142,7 @@ std::vector<std::pair<int, int>> Assembler::primeIterator() {
 	for (int i = 0; i < 6; i++)
 		iter.push_back(std::make_pair(0, 0));
 	for (int i = 0; i < store.size(); i++)
-		iter.at(i).second = store.getList(i).size();
+		iter.at(i).second = (int)store.getList(i).size();
 
 	return iter;
 }

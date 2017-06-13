@@ -96,7 +96,7 @@ public:
 	}
 
 	int numberOfParameters() {
-		return requiredParams.size();
+		return (int)requiredParams.size();
 	}
 
 	bool isArrayAssign() {

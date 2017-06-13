@@ -60,7 +60,7 @@ int main() {
 		std::cout << "\nGenerating functions of length: " << i << std::endl;
 		std::vector<std::string> functions = functionGenerator.generateAllFunctonInstances();
 		std::cout << "Testing " << functions.size() << " functions" << std::endl;
-		variationsTried = variationsTried + functions.size();
+		variationsTried = variationsTried + (int)functions.size();
 
 		double percentComplete = 0;
 		int countSinceLastOutput = 0;
