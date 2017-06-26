@@ -58,6 +58,7 @@ int main() {
 	GeneticTransform GA = GeneticTransform(population, newFunctions, requires, input, target);
 	function = GA.cycleGeneration();
 	std::vector<std::pair<DanaLineSet, double>> resultPopulation = GA.getPopulation();
+	std::map<std::string, double> stats = GA.getLastCycleStats();
 
 	//Calculate time taken to run 
 	clock_t end = clock();
@@ -77,8 +78,16 @@ int main() {
 	//Store output of process as a text file 
 	std::string processOutput = "\n";
 	processOutput += "Time taken: " + std::to_string(elapsed_secs) + " CPU seconds\n";
-	processOutput += function;
+	processOutput += "Number of Generations: " + std::to_string((int)stats["Number Of Generations"]) + '\n';
+	processOutput += function; 
 	appendDataFile(processOutput, "Resources/diagnostics.txt");
+
+	//Create detailed output for generational statistics
+	stats.erase("Number Of Generations");
+	std::string out = "\n";
+	for (auto i : stats)
+		out += i.first + "\t" + std::to_string(i.second) + "\n";
+	appendDataFile(out, "Resources/average_length_of_functions.txt");
 
 	if (shouldRunAgain())
 		main();

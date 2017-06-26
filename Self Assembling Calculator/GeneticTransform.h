@@ -5,6 +5,7 @@
 #include <assert.h> 
 #include <ctime>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <string>
 #include <stdlib.h>
@@ -20,6 +21,7 @@ private:
 	std::vector<std::pair<DanaLineSet, double>> populaton;
 	std::vector<DanaFunction> knownFunctions;
 	std::vector<std::string> functionHeader;
+	std::map<std::string, double> stats;
 	std::string input;
 	std::string target;
 	std::string resultFunction;
@@ -51,6 +53,7 @@ public:
 	void rank(); 
 	std::string cycleGeneration();
 	std::vector<std::pair<DanaLineSet, double>> getPopulation();
+	std::map<std::string, double> getLastCycleStats();
 
 	// Destructor 
 	~GeneticTransform();

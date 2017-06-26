@@ -358,14 +358,15 @@ void GeneticTransform::crossover() {
 
 }
 
-void GeneticTransform::test() {
-	for (int x = 0; x < populaton.size(); x++) {
+void GeneticTransform::test() {	
+	for (int i = 0; i < populaton.size(); i++) {
 		//	Store current function and set score to 0 initially 
-		DanaLineSet currentFunction = populaton.at(x).first;
+		DanaLineSet currentFunction = populaton.at(i).first;
 		double score = 0;
 
-		if (currentFunction.numberOfLines() == 0) {
-			populaton.at(x).second = 0;
+		const int numberOfLines = currentFunction.numberOfLines();
+		if (numberOfLines == 0) {
+			populaton.at(i).second = 0;
 			continue;
 		}
 
@@ -375,7 +376,6 @@ void GeneticTransform::test() {
 		}
 
 		//	How many lines does the function have
-		const int numberOfLines = currentFunction.numberOfLines();
 		const int bestNumberOfLines = 6;
 		const int distance = abs(bestNumberOfLines - numberOfLines);
 		score = distance == 0 ? score += 2 : score += ((double)1 / distance);
@@ -383,8 +383,8 @@ void GeneticTransform::test() {
 		//	How many functions does the function use
 		const int numberOfFunctions = (int)knownFunctions.size();
 		std::vector<std::string> usedFunctions;
-		for (int i = 0; i < numberOfLines; i++) {
-			DanaFunction funcUsedOnThisLine = currentFunction.getLine(i).getFunctionCalled();
+		for (int j = 0; j < numberOfLines; j++) {
+			DanaFunction funcUsedOnThisLine = currentFunction.getLine(j).getFunctionCalled();
 			if (std::find(usedFunctions.begin(), usedFunctions.end(),
 				funcUsedOnThisLine.name + std::to_string(funcUsedOnThisLine.isArrayAssign())) == usedFunctions.end()) {
 				usedFunctions.push_back(funcUsedOnThisLine.name + std::to_string(funcUsedOnThisLine.isArrayAssign()));
@@ -394,10 +394,20 @@ void GeneticTransform::test() {
 
 		//	Compose function for testing
 		std::vector<std::string> outFunction = functionHeader;
-		const int lineCount = currentFunction.numberOfLines();
-		const DanaVariable varToReturn = currentFunction.getLine(lineCount - 1).getDeclaredVariable();
-		for (int i = 0; i < lineCount; i++) 
-			outFunction.push_back("\t\t" + currentFunction.getLine(i).composeLine());
+		DanaVariable varToReturn = currentFunction.getLine(numberOfLines - 1).getDeclaredVariable();
+		for (int j = 0; j < numberOfLines; j++)
+			outFunction.push_back("\t\t" + currentFunction.getLine(j).composeLine());
+
+		//	Look for the last defined integer to return
+		std::vector<DanaVariable> vars = currentFunction.getAllVariables();
+		for (int j = (int)vars.size() - 1; j > -1; j--) {
+			if (vars.at(j).type == "int") {
+				varToReturn = vars.at(j);
+				break;
+			}
+		}
+
+		//	Add function footer
 		outFunction.push_back("\t\treturn " + varToReturn.name);
 		outFunction.push_back("\t}");
 		outFunction.push_back("}");
@@ -413,7 +423,7 @@ void GeneticTransform::test() {
 		}
 
 		//	Set score to the population func / score pair
-		populaton.at(x).second = score;
+		populaton.at(i).second = score;
 	}
 }
 
@@ -429,10 +439,31 @@ void GeneticTransform::rank() {
 }
 
 std::string GeneticTransform::cycleGeneration() {
-	while (resultFunction == "") {
-		test();
-		rank();
+	stats.clear();
+	int numberOfGenerations = 0;
 
+	//	Loop until a result function is found
+	while (resultFunction == "") {
+		if (numberOfGenerations > 0) {
+			test();
+			rank();
+			
+			//	Calculate avergage length of functions this generation
+			double averageLength = 0;
+			for (auto i : populaton)
+				averageLength += i.first.numberOfLines();
+
+			//	Produce key for storing in map
+			std::string outputkey = "Generation" + std::to_string(numberOfGenerations);
+			if (numberOfGenerations < 10)
+				outputkey = "Generation00" + std::to_string(numberOfGenerations);
+			else if (numberOfGenerations < 100)
+				outputkey = "Generation0" + std::to_string(numberOfGenerations);
+
+			//	Store key value pair in map
+			stats[outputkey] = averageLength / (double)populaton.size();
+		}
+		
 		//	For each member of the population - perform a random muation
 		for (int i = 0; i < populaton.size(); i++) {
 			const int whichMutation = getRandomNumber(0, 2);
@@ -448,11 +479,16 @@ std::string GeneticTransform::cycleGeneration() {
 				break;
 			}
 		}
+
+		numberOfGenerations++;
 	}
 
 	//	Write result function to file so it can be tested by the client 
 	writeDataFile(resultFunction, outputPath);
 	compileFunction(outputPath);
+
+	//	Compose stats
+	stats["Number Of Generations"] = numberOfGenerations;
 
 	return resultFunction;
 }
@@ -460,6 +496,10 @@ std::string GeneticTransform::cycleGeneration() {
 std::vector<std::pair<DanaLineSet, double>> GeneticTransform::getPopulation() {
 	return populaton;
 } 
+
+std::map<std::string, double> GeneticTransform::getLastCycleStats() {
+	return stats;
+}
 
 /* - Destructor - */
 
