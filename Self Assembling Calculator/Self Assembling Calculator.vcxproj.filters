@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneticTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DanaVariable.h">
@@ -32,7 +35,7 @@
     <ClInclude Include="DanaLineSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LineStore.h">
+    <ClInclude Include="GeneticTransform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

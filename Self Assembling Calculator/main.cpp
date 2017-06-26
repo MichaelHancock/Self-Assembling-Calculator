@@ -6,17 +6,14 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "DanaFunction.h"
+#include "DanaLineSet.h"
+#include "GeneticTransform.h"
 
 //Function prototypes
 std::string readDataFile(std::string);
-void writeDataFile(std::string, std::string);
 std::string getRequiredInterfaces();
-std::string runSystemCommand(std::string);
-bool compileFunction(std::string);
-bool testFunction(std::string, std::string, std::string);
-int testFunction(std::string, std::string);
 void appendDataFile(std::string, std::string);
+int testFunction(std::string, std::string);
 bool shouldRunAgain();
 
 int main() {
@@ -30,6 +27,24 @@ int main() {
 	std::cout << "\n - Required Interfaces - \nInput required interfaces (seperate by <enter_key>), when complete type -d" << std::endl;
 	const std::string requires = getRequiredInterfaces();
 
+	//Initialise functions needed for generator
+	std::vector<DanaFunction> newFunctions = {};
+	newFunctions.push_back(DanaFunction("adder.add", "int", { "int", "int" }));
+	newFunctions.push_back(DanaFunction("uInt.intFromString", "int", { "char" }));
+
+	//Generate primary line of function - including assign from functions params 
+	DanaFunction primaryFunctionCall = DanaFunction(DanaVariable("params", "char", 5), "string");
+	primaryFunctionCall.setMatchedParam(DanaVariable("x", "int", std::to_string(0)), 0);
+	DanaLine primaryLine = DanaLine(0, DanaVariable("a", "char", 5), primaryFunctionCall);
+
+	//Initialise the primary population
+	std::vector<DanaLineSet> population;
+	for (int i = 0; i < 10; i++) {
+		DanaLineSet newLineSet;
+		newLineSet.insertLine(primaryLine);
+		population.push_back(newLineSet);
+	}
+
 	//Loop until solution can be found
 	const std::string outputPath = "Resources/calculator.dn";
 	const std::string compilePath = "Resources/calculator.o";
@@ -40,23 +55,13 @@ int main() {
 	//Start thread to generate new functions
 	clock_t begin = clock();
 
-	/*
-		Generation happens here
-	*/
+	GeneticTransform GA = GeneticTransform(population, newFunctions, requires, input, target);
+	function = GA.cycleGeneration();
+	std::vector<std::pair<DanaLineSet, double>> resultPopulation = GA.getPopulation();
 
 	//Calculate time taken to run 
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
-	if (!solutionFound) {
-		std::cout << "\nNo solution found:" << std::endl;
-		std::cout << "Time taken " << elapsed_secs << " CPU seconds" << std::endl;
-
-		if (shouldRunAgain())
-			main();
-		else
-			return 0;
-	}
 
 	//Output result to console
 	std::cout << "\n\nFunction generated successfully in " << elapsed_secs << " CPU seconds" << std::endl;
@@ -117,15 +122,8 @@ std::string readDataFile(std::string errorMessage) {
 	return result;
 }
 
-void writeDataFile(std::string toWrite, std::string path) {
-	//Output generated file
-	std::ofstream generatedFile(path);
-	generatedFile << toWrite;
-	generatedFile.close();
-}
-
 void appendDataFile(std::string toWrite, std::string path) {
-	//Append string to file
+	//Append string to file 
 	std::ofstream outfile;
 	outfile.open(path, std::ios_base::app);
 	outfile << toWrite;
@@ -155,42 +153,6 @@ std::string getRequiredInterfaces() {
 	}
 
 	return requires;
-}
-
-std::string runSystemCommand(std::string command) {
-	//Execute system command and return result string
-	const std::shared_ptr<FILE> pipe(_popen(command.c_str(), "r"), _pclose);
-	std::array<char, 128> buffer;
-	std::string result;
-
-	//Check for early command fail
-	if (!pipe)
-		throw std::runtime_error("popen() failed!");
-
-	//Read data from pipe
-	while (!feof(pipe.get())) {
-		if (fgets(buffer.data(), 128, pipe.get()) != NULL)
-			result = result + buffer.data();
-	}
-
-	return result;
-}
-
-bool compileFunction(std::string path) {
-	//Try to compile new function
-	const std::string command = "dnc " + path;
-	const int response = system(command.c_str());
-
-	return response == 0;
-}
-
-bool testFunction(std::string path, std::string test, std::string expectedResult) {
-	//Test new function and compare with target
-	const std::string inputWithFormatting = "\"" + test + "\"";
-	const std::string command = "dana " + path + " " + inputWithFormatting;
-	const int response = system(command.c_str());
-
-	return response == std::stoi(expectedResult);
 }
 
 int testFunction(std::string path, std::string test) {

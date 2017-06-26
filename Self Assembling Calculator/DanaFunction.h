@@ -59,6 +59,10 @@ public:
 		return requiredParams.at(index);
 	}
 
+	DanaVariable getFunctionObject() {
+		return functionObject;
+	}
+
 	void setMatchedParam(DanaVariable param, int index) {
 		if (param.type == getParameterType(index))
 			matchedParams.at(index) = param;

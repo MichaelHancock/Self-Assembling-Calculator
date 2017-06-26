@@ -1,0 +1,28 @@
+
+Time taken: 56.469000 CPU seconds
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		char c = a [ 4 ]
+		char d = a [ 1 ]
+		int e = uInt.intFromString ( b )
+		char f = a [ 1 ]
+		int g = uInt.intFromString ( c )
+		int h = adder.add ( e, g )
+		return h
+	}
+}
+
+Time taken: 60.357000 CPU seconds
+component provides App requires Adder adder, data.IntUtil uInt  {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 2 ]
+		int c = uInt.intFromString ( a )
+		char d = a [ 4 ]
+		int e = uInt.intFromString ( d )
+		int f = adder.add ( c, e )
+		return f
+	}
+}

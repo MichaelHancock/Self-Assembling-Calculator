@@ -32,6 +32,10 @@ public:
 		return lineNumber;
 	}
 
+	void setLineNumber(int newNumber) {
+		lineNumber = newNumber;
+	}
+
 	DanaVariable getDeclaredVariable() {
 		return declaredVariable;
 	}
@@ -51,6 +55,11 @@ public:
 
 	std::string composeLine() {
 		return declaredVariable.composeVariable() + " = " + functionCalled.composeFunctionCall();
+	}
+
+	bool operator==(const DanaLine& dl) {
+		DanaLine check = dl;
+		return check.composeLine() == composeLine();
 	}
 };
 

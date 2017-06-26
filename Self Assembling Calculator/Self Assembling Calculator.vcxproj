@@ -111,6 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeneticTransform.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -118,7 +119,7 @@
     <ClInclude Include="DanaLine.h" />
     <ClInclude Include="DanaLineSet.h" />
     <ClInclude Include="DanaVariable.h" />
-    <ClInclude Include="LineStore.h" />
+    <ClInclude Include="GeneticTransform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
