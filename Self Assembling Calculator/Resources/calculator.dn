@@ -1,11 +1,12 @@
-component provides App requires Adder adder, data.IntUtil uInt  {
+component provides App requires Adder adder, data.IntUtil uInt {
 	int App:main(AppParam params[]) {
 		char a []  = params [ 0 ].string
-		char b = a [ 2 ]
+		char b = a [ 4 ]
 		int c = uInt.intFromString ( a )
-		char d = a [ 4 ]
-		int e = uInt.intFromString ( d )
-		int f = adder.add ( c, e )
-		return f
+		char d = a [ 0 ]
+		int e = uInt.intFromString ( b )
+		int f = uInt.intFromString ( d )
+		int g = adder.add ( c, e )
+		return g
 	}
 }

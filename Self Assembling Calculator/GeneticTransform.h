@@ -48,7 +48,7 @@ public:
 	DanaLineSet insertLine(DanaLineSet); 
 	DanaLineSet modifyLine(DanaLineSet); 
 	DanaLineSet deleteLine(DanaLineSet);  
-	void crossover(); //
+	DanaLineSet crossover(const DanaLineSet &, const DanaLineSet &);
 	void test(); 
 	void rank(); 
 	std::string cycleGeneration();

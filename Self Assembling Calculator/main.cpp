@@ -82,13 +82,6 @@ int main() {
 	processOutput += function; 
 	appendDataFile(processOutput, "Resources/diagnostics.txt");
 
-	//Create detailed output for generational statistics
-	stats.erase("Number Of Generations");
-	std::string out = "\n";
-	for (auto i : stats)
-		out += i.first + "\t" + std::to_string(i.second) + "\n";
-	appendDataFile(out, "Resources/average_length_of_functions.txt");
-
 	if (shouldRunAgain())
 		main();
 

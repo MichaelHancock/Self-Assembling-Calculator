@@ -354,8 +354,43 @@ DanaLineSet GeneticTransform::deleteLine(DanaLineSet lnSet) {
 	return newLineSet;
 }
 
-void GeneticTransform::crossover() {
+DanaLineSet GeneticTransform::crossover(const DanaLineSet &one, const DanaLineSet &other) {
+	//	Store passed class info
+	DanaLineSet current = DanaLineSet(one);
+	DanaLineSet passedLineSet = DanaLineSet(other);
 
+	//	If there are to few lines for a crossover - do an early return and force GA to insert a line
+	if (passedLineSet.numberOfLines() < 2 || current.numberOfLines() < 2) 
+		return insertLine(current);
+	
+	//	Select a random line from the other lineset
+	const int passedNumberOfLines = passedLineSet.numberOfLines();
+	const int randomPassedLineIndex = getRandomNumber(1, passedNumberOfLines - 1);
+	DanaLine passedLine = passedLineSet.getLine(randomPassedLineIndex);
+
+	DanaFunction calledFunc = passedLine.getFunctionCalled();
+	DanaVariable declaredVar = passedLine.getDeclaredVariable();
+
+	//	If is array assign - copy index that other lineset used
+	if (calledFunc.isArrayAssign()) {
+		DanaVariable index = calledFunc.getMatchedParameter(0);
+
+		//	Find the last array assign in current - replace the index used 
+		for (int i = current.numberOfLines() - 1; i > -1; i--) {
+			if (current.getLine(i).getFunctionCalled().isArrayAssign() && i > 0) {
+				DanaFunction replaceFunc = DanaFunction(current.getLine(i).getFunctionCalled().getFunctionObject());
+				replaceFunc.setMatchedParam(index, 0);
+				DanaLine replacementLine = DanaLine(i, current.getLine(i).getDeclaredVariable(), replaceFunc);
+				current.insertLine(replacementLine);
+				return current;
+			}
+		}
+
+		//	If no array assign is found - return current
+		return current;
+	}
+
+	return current;
 }
 
 void GeneticTransform::test() {	
@@ -417,7 +452,7 @@ void GeneticTransform::test() {
 		writeDataFile(function, outputPath);
 		if (compileFunction(outputPath)) {
 			if (testFunction(compilePath, input, target)) {
-				score += 1;
+				score += 5;
 				resultFunction = function;
 			}
 		}
@@ -448,20 +483,10 @@ std::string GeneticTransform::cycleGeneration() {
 			test();
 			rank();
 			
-			//	Calculate avergage length of functions this generation
-			double averageLength = 0;
-			for (auto i : populaton)
-				averageLength += i.first.numberOfLines();
-
-			//	Produce key for storing in map
-			std::string outputkey = "Generation" + std::to_string(numberOfGenerations);
-			if (numberOfGenerations < 10)
-				outputkey = "Generation00" + std::to_string(numberOfGenerations);
-			else if (numberOfGenerations < 100)
-				outputkey = "Generation0" + std::to_string(numberOfGenerations);
-
-			//	Store key value pair in map
-			stats[outputkey] = averageLength / (double)populaton.size();
+			//	Crossover the top line sets with the bottom ones
+			const int topIndex = (int)populaton.size() - 1;
+			for (int i = 0; i < populaton.size() / 2; i++) 
+				populaton.at(i).first = crossover(populaton.at(i).first, populaton.at(topIndex - i).first);
 		}
 		
 		//	For each member of the population - perform a random muation
@@ -504,5 +529,8 @@ std::map<std::string, double> GeneticTransform::getLastCycleStats() {
 /* - Destructor - */
 
 GeneticTransform::~GeneticTransform() {
+	knownFunctions.clear();
+	functionHeader.clear();
+	stats.clear();
 	populaton.clear();
 }
