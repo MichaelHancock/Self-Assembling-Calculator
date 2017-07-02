@@ -35,10 +35,6 @@ int GeneticTransform::getRandomNumber(int low, int high) {
 	if (low == high)
 		return low;
 
-	if (low > high)
-		std::swap(low, high);
-
-	//	Generate random number
 	high = (high - low) + 1;
 	return rand() % high + low;
 }
@@ -49,7 +45,7 @@ std::string GeneticTransform::getVariableName(int lineNumber) {
 }
 
 std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std::vector<DanaVariable> &knownVariables) {
-	std::vector<DanaVariable> vars = knownVariables;
+	const std::vector<DanaVariable> vars = knownVariables;
 	std::vector<DanaLine> potentialLines = {};
 	std::vector<DanaFunction> validFunctions = {};
 
@@ -251,15 +247,43 @@ void GeneticTransform::writeDataFile(std::string toWrite, std::string path) {
 	generatedFile.close();
 }
 
-std::string GeneticTransform::collpaseVector(std::vector<std::string> &lines) {
-	std::string result = "";
+std::string inline GeneticTransform::funcToString(DanaLineSet lnSet, std::string varToReturn) {
+	DanaLineSet currentFunction = lnSet;
+	const int numberOfLines = currentFunction.numberOfLines();
+
+	//	Compose function
+	std::vector<std::string> outFunction = functionHeader;
+	for (int j = 0; j < numberOfLines; j++)
+		outFunction.push_back("\t\t" + currentFunction.getLine(j).composeLine());
+
+	//	Add function footer
+	outFunction.push_back("\t\treturn " + varToReturn);
+	outFunction.push_back("\t}");
+	outFunction.push_back("}");
 
 	//	Collapse vector into string, add lines spaces
-	for (int i = 0; i < lines.size(); i++) {
-		result += lines.at(i) + "\n";
-	}
+	std::string result = "";
+	for (int i = 0; i < outFunction.size(); i++) 
+		result += outFunction.at(i) + "\n";
 
 	return result;
+}
+
+DanaVariable GeneticTransform::findReturnVariable(DanaLineSet lnSet) {
+	DanaLineSet currentFunction = lnSet;
+	const int numberOfLines = currentFunction.numberOfLines();
+
+	//	Look for the last defined integer to return
+	DanaVariable varToReturn = currentFunction.getLine(numberOfLines - 1).getDeclaredVariable();
+	std::vector<DanaVariable> vars = currentFunction.getAllVariables();
+	for (int j = (int)vars.size() - 1; j > -1; j--) {
+		if (vars.at(j).type == "int") {
+			varToReturn = vars.at(j);
+			break;
+		}
+	}
+
+	return varToReturn;
 }
 
 /* - Public member functions - */
@@ -393,11 +417,30 @@ DanaLineSet GeneticTransform::crossover(const DanaLineSet &one, const DanaLineSe
 	return current;
 }
 
+DanaLineSet GeneticTransform::removeUnnecessaryLines(DanaLineSet lnSet, DanaVariable returnVar) {
+	DanaLineSet newLineSet = lnSet;
+	DanaVariable varToReturn = returnVar;
+
+	//	Look for lines whom declare vars that are used nowhere else
+	for (int i = 0; i < newLineSet.numberOfLines(); i++) {
+		DanaLine currentLine = newLineSet.getLine(i);
+		DanaVariable declaredVar = currentLine.getDeclaredVariable();
+		const int varUsages = (int)newLineSet.findVariableUsages(declaredVar).size();
+
+		//	If var is used nowhere else and is not the return var - Delete the line
+		if (varUsages == 0 && declaredVar.name != varToReturn.name)
+			newLineSet.deleteLine(i);
+	}
+	
+	return correctVariableNames(newLineSet);
+}
+
 void GeneticTransform::test() {	
 	for (int i = 0; i < populaton.size(); i++) {
 		//	Store current function and set score to 0 initially 
 		DanaLineSet currentFunction = populaton.at(i).first;
 		double score = 0;
+		bool returnInt = false;
 
 		const int numberOfLines = currentFunction.numberOfLines();
 		if (numberOfLines == 0) {
@@ -407,6 +450,7 @@ void GeneticTransform::test() {
 
 		//	Does the function return an integer
 		if (currentFunction.getLine(currentFunction.numberOfLines() - 1).getDeclaredVariable().type == "int") {
+			returnInt = true;
 			score++;
 		}
 
@@ -427,33 +471,26 @@ void GeneticTransform::test() {
 		}
 		score += (double)usedFunctions.size() / (double)numberOfFunctions;
 
-		//	Compose function for testing
-		std::vector<std::string> outFunction = functionHeader;
-		DanaVariable varToReturn = currentFunction.getLine(numberOfLines - 1).getDeclaredVariable();
-		for (int j = 0; j < numberOfLines; j++)
-			outFunction.push_back("\t\t" + currentFunction.getLine(j).composeLine());
-
-		//	Look for the last defined integer to return
-		std::vector<DanaVariable> vars = currentFunction.getAllVariables();
-		for (int j = (int)vars.size() - 1; j > -1; j--) {
-			if (vars.at(j).type == "int") {
-				varToReturn = vars.at(j);
-				break;
-			}
+		//	if function does not return an int, there is no point testing it - so skip the following stages of testing
+		if (!returnInt) {
+			populaton.at(i).second = score;
+			continue;
 		}
 
-		//	Add function footer
-		outFunction.push_back("\t\treturn " + varToReturn.name);
-		outFunction.push_back("\t}");
-		outFunction.push_back("}");
+		//	Find the variable to return from the function
+		DanaVariable varToReturn = findReturnVariable(currentFunction);
 
 		//	Compile and test function
-		const std::string function = collpaseVector(outFunction);
+		const std::string function = funcToString(currentFunction, varToReturn.name);
 		writeDataFile(function, outputPath);
 		if (compileFunction(outputPath)) {
 			if (testFunction(compilePath, input, target)) {
-				score += 5;
-				resultFunction = function;
+				score += 5; 
+
+				//	Strip unnecessary lines from the function
+				DanaLineSet prunedFunc = removeUnnecessaryLines(currentFunction, varToReturn);
+				varToReturn = findReturnVariable(prunedFunc);
+				resultFunction = funcToString(prunedFunc, varToReturn.name);
 			}
 		}
 

@@ -37,7 +37,8 @@ private:
 	bool compileFunction(std::string);
 	bool testFunction(std::string, std::string, std::string);
 	void writeDataFile(std::string, std::string);
-	std::string collpaseVector(std::vector<std::string> &);
+	std::string inline funcToString(DanaLineSet, std::string);
+	DanaVariable findReturnVariable(DanaLineSet);
 
 public:
 	//	Constructor
@@ -49,6 +50,7 @@ public:
 	DanaLineSet modifyLine(DanaLineSet); 
 	DanaLineSet deleteLine(DanaLineSet);  
 	DanaLineSet crossover(const DanaLineSet &, const DanaLineSet &);
+	DanaLineSet removeUnnecessaryLines(DanaLineSet, DanaVariable);
 	void test(); 
 	void rank(); 
 	std::string cycleGeneration();
