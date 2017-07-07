@@ -784,3 +784,320 @@ component provides App requires Adder adder, data.IntUtil uInt {
 		return j
 	}
 }
+
+Time taken: 18.830000 CPU seconds
+Number of Generations: 85
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		int c = uInt.intFromString ( b )
+		char d = a [ 4 ]
+		int e = uInt.intFromString ( d )
+		int f = adder.add ( c, e )
+		return f
+	}
+}
+
+Time taken: 23.631000 CPU seconds
+Number of Generations: 100
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( c )
+		char e = a [ 2 ]
+		int f = uInt.intFromString ( e )
+		int g = uInt.intFromString ( b )
+		int h = adder.add ( f, g )
+		int i = adder.add ( h, d )
+		return i
+	}
+}
+
+Time taken: 39.975000 CPU seconds
+Number of Generations: 126
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 2 ]
+		int d = uInt.intFromString ( b )
+		char e = a [ 0 ]
+		int f = uInt.intFromString ( e )
+		int g = adder.add ( f, f )
+		int h = adder.add ( d, f )
+		return h
+	}
+}
+
+Time taken: 17.720000 CPU seconds
+Number of Generations: 64
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		int c = uInt.intFromString ( b )
+		char d = a [ 4 ]
+		int e = uInt.intFromString ( d )
+		int f = adder.add ( c, e )
+		return f
+	}
+}
+
+Time taken: 23.738000 CPU seconds
+Number of Generations: 101
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 1 ]
+		char c = a [ 4 ]
+		int d = uInt.intFromString ( c )
+		int e = uInt.intFromString ( a )
+		int f = adder.add ( d, e )
+		return f
+	}
+}
+
+Time taken: 15.163000 CPU seconds
+Number of Generations: 68
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( b )
+		int e = uInt.intFromString ( c )
+		int f = adder.add ( e, d )
+		return f
+	}
+}
+
+Time taken: 16.304000 CPU seconds
+Number of Generations: 54
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 3 ]
+		int d = uInt.intFromString ( b )
+		int e = uInt.intFromString ( a )
+		int f = adder.add ( e, d )
+		return f
+	}
+}
+
+Time taken: 42.937000 CPU seconds
+Number of Generations: 165
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 2 ]
+		int d = uInt.intFromString ( a )
+		int e = uInt.intFromString ( b )
+		int f = adder.add ( e, d )
+		return f
+	}
+}
+
+Time taken: 17.495000 CPU seconds
+Number of Generations: 76
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		int c = uInt.intFromString ( a )
+		int d = uInt.intFromString ( b )
+		int e = adder.add ( d, c )
+		return e
+	}
+}
+
+Time taken: 11.397000 CPU seconds
+Number of Generations: 52
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( b )
+		int e = uInt.intFromString ( c )
+		int f = adder.add ( e, d )
+		return f
+	}
+}
+
+Time taken: 3.880000 CPU seconds
+Number of Generations: 25
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		char c = a [ 4 ]
+		char d = a [ 4 ]
+		int e = uInt.intFromString ( d )
+		int f = adder.add ( e, e )
+		int g = uInt.intFromString ( b )
+		int h = adder.add ( e, g )
+		return h
+	}
+}
+
+Time taken: 23.223000 CPU seconds
+Number of Generations: 100
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		int c = uInt.intFromString ( b )
+		int d = uInt.intFromString ( a )
+		int e = adder.add ( c, d )
+		return e
+	}
+}
+
+Time taken: 8.636000 CPU seconds
+Number of Generations: 45
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		char c = a [ 4 ]
+		char d = a [ 4 ]
+		int e = uInt.intFromString ( c )
+		int f = uInt.intFromString ( b )
+		int g = uInt.intFromString ( d )
+		int h = adder.add ( f, e )
+		return h
+	}
+}
+
+Time taken: 49.602000 CPU seconds
+Number of Generations: 161
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 0 ]
+		char c = a [ 4 ]
+		int d = uInt.intFromString ( c )
+		int e = uInt.intFromString ( b )
+		int f = adder.add ( e, d )
+		return f
+	}
+}
+
+Time taken: 17.370000 CPU seconds
+Number of Generations: 77
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		int c = uInt.intFromString ( b )
+		int d = uInt.intFromString ( a )
+		int e = adder.add ( c, d )
+		return e
+	}
+}
+
+Time taken: 147.930000 CPU seconds
+Number of Generations: 434
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( b )
+		int e = uInt.intFromString ( c )
+		char f = a [ 3 ]
+		int g = adder.add ( e, d )
+		return g
+	}
+}
+
+Time taken: 12.821000 CPU seconds
+Number of Generations: 46
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( c )
+		int e = uInt.intFromString ( b )
+		int f = adder.add ( d, e )
+		return f
+	}
+}
+
+Time taken: 42.642000 CPU seconds
+Number of Generations: 105
+component provides App requires Adder adder, data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		char c = a [ 0 ]
+		int d = uInt.intFromString ( c )
+		int e = uInt.intFromString ( b )
+		char f = a [ 2 ]
+		int g = adder.add ( d, e )
+		return g
+	}
+}
+
+Time taken: 125.637000 CPU seconds
+Number of Generations: 377
+component provides App requires data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		int b = uInt.intFromString ( a )
+		char c = a [ 4 ]
+		int d = uInt.intFromString ( c )
+		int e = d + b
+		return e
+	}
+}
+
+Time taken: 14.583000 CPU seconds
+Number of Generations: 61
+component provides App requires data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 2 ]
+		char c = a [ 4 ]
+		char d = a [ 0 ]
+		int e = uInt.intFromString ( c )
+		int f = uInt.intFromString ( d )
+		int g = f + e
+		return g
+	}
+}
+
+Time taken: 9.509000 CPU seconds
+Number of Generations: 42
+component provides App requires data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		int b = uInt.intFromString ( a )
+		char c = a [ 4 ]
+		int d = uInt.intFromString ( c )
+		int e = b + b
+		int f = b + d
+		return f
+	}
+}
+
+Time taken: 39.055000 CPU seconds
+Number of Generations: 147
+component provides App requires data.IntUtil uInt {
+	int App:main(AppParam params[]) {
+		char a []  = params [ 0 ].string
+		char b = a [ 4 ]
+		int c = uInt.intFromString ( b )
+		char d = a [ 0 ]
+		int e = uInt.intFromString ( d )
+		int f = uInt.intFromString ( b )
+		int g = c + e
+		return g
+	}
+}

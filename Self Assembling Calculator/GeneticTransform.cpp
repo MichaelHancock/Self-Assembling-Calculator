@@ -24,6 +24,9 @@ GeneticTransform::GeneticTransform(std::vector<DanaLineSet> &initialPopulation, 
 		}
 	}
 
+	//	Add infix operators to functions
+	knownFunctions.push_back(DanaFunction("+", "int", { "int", "int" }, true));
+
 	//	Compose function header - including required functions
 	functionHeader.push_back("component provides App requires" + requires + " {");
 	functionHeader.push_back("\tint App:main(AppParam params[]) {");
@@ -253,8 +256,9 @@ std::string inline GeneticTransform::funcToString(DanaLineSet lnSet, std::string
 
 	//	Compose function
 	std::vector<std::string> outFunction = functionHeader;
-	for (int j = 0; j < numberOfLines; j++)
+	for (int j = 0; j < numberOfLines; j++) {
 		outFunction.push_back("\t\t" + currentFunction.getLine(j).composeLine());
+	}
 
 	//	Add function footer
 	outFunction.push_back("\t\treturn " + varToReturn);

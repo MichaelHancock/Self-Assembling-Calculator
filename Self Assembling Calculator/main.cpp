@@ -29,7 +29,6 @@ int main() {
 
 	//Initialise functions needed for generator
 	std::vector<DanaFunction> newFunctions = {};
-	newFunctions.push_back(DanaFunction("adder.add", "int", { "int", "int" }));
 	newFunctions.push_back(DanaFunction("uInt.intFromString", "int", { "char" }));
 
 	//Generate primary line of function - including assign from functions params 

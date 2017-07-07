@@ -13,6 +13,7 @@ private:
 	std::string assignmentModifier;
 	DanaVariable functionObject;
 	bool arrayAssign;
+	bool infix;
 
 public:
 	std::string name;
@@ -25,9 +26,25 @@ public:
 		returnType = functionReturnType;
 		requiredParams = listOfParamTypes;
 		arrayAssign = false;
-		
+		infix = false;
+
 		for (auto i : requiredParams)
 			matchedParams.push_back(DanaVariable());
+	}
+
+	DanaFunction(std::string functionName, std::string functionReturnType, std::vector<std::string> listOfParamTypes, bool isInfix) {
+		name = functionName;
+		returnType = functionReturnType;
+		requiredParams = listOfParamTypes;
+		arrayAssign = false;
+		infix = isInfix;
+
+		if (infix && requiredParams.size() != 2) {
+			std::string errorMessage = "Infix function has the wrong number of required parameters: ";
+			errorMessage += std::to_string(requiredParams.size());
+
+			throw std::exception(errorMessage.c_str());
+		}
 	}
 
 	DanaFunction(DanaVariable danaArray) {
@@ -64,8 +81,12 @@ public:
 	}
 
 	void setMatchedParam(DanaVariable param, int index) {
-		if (param.type == getParameterType(index))
-			matchedParams.at(index) = param;
+		if (param.type == getParameterType(index)) {
+			if (matchedParams.size() <= index || matchedParams.size() == 0) 
+				matchedParams.push_back(param);
+			else 
+				matchedParams.at(index) = param;
+		}
 		else {
 			std::string errorMessage = "Type mismatch between provided param type '" + param.type;
 			errorMessage += "' and " + name;
@@ -87,6 +108,10 @@ public:
 			std::string outVal = paramValue.size() > 0 ? paramValue : matchedParams.at(0).name;
 			return functionObject.name + " [ " + outVal + " ]" + assignmentModifier;
 		}
+		else if (isInfix()) {
+			std::string call = matchedParams.at(0).name + " " + name + " " + matchedParams.at(1).name;
+			return call;
+		}
 
 		std::string call = name + " ( ";
 		for (int i = 0; i < numberOfParameters(); i++) {
@@ -101,6 +126,10 @@ public:
 
 	int numberOfParameters() {
 		return (int)requiredParams.size();
+	}
+
+	bool isInfix() {
+		return infix;
 	}
 
 	bool isArrayAssign() {

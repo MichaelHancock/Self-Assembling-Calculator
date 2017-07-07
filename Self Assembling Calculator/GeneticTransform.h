@@ -42,7 +42,7 @@ private:
 
 public:
 	//	Constructor
-	GeneticTransform(std::vector<DanaLineSet> &, std::vector<DanaFunction> &, 
+	GeneticTransform(std::vector<DanaLineSet> &, std::vector<DanaFunction> &,
 		std::string, std::string, std::string);	
 
 	//	Public member functions
@@ -51,8 +51,8 @@ public:
 	DanaLineSet deleteLine(DanaLineSet);  
 	DanaLineSet crossover(const DanaLineSet &, const DanaLineSet &);
 	DanaLineSet removeUnnecessaryLines(DanaLineSet, DanaVariable);
-	void test(); 
-	void rank(); 
+	void test();
+	void rank();
 	std::string cycleGeneration();
 	std::vector<std::pair<DanaLineSet, double>> getPopulation();
 	std::map<std::string, double> getLastCycleStats();

@@ -1,6 +1,0 @@
-component provides Adder {
-		int Adder:add(int a, int b)
-			{
-				return a + b
-			}
-}
