@@ -28,8 +28,7 @@ int main() {
 	const std::string requires = getRequiredInterfaces();
 
 	//	Initialise functions needed for generator
-	std::vector<DanaFunction> newFunctions = {};
-	newFunctions.push_back(DanaFunction("uInt.intFromString", "int", { "char" }));
+	std::vector<DanaFunction> newFunctions = {DanaFunction("uInt.intFromString", "int",{ "char" })};
 
 	//	Generate primary line of function - including assign from functions params 
 	DanaFunction primaryFunctionCall = DanaFunction(DanaVariable("params", "char", 5), "string");
@@ -53,8 +52,8 @@ int main() {
 
 	GeneticTransform GA = GeneticTransform(population, newFunctions, requires, input, target);
 	function = GA.cycleGeneration();
-	std::vector<std::pair<DanaLineSet, double>> resultPopulation = GA.getPopulation();
-	std::map<std::string, double> stats = GA.getLastCycleStats();
+	const std::vector<std::pair<DanaLineSet, double>> resultPopulation = GA.getPopulation();
+	const std::map<std::string, double> stats = GA.getLastCycleStats();
 
 	//	Calculate time taken to run 
 	clock_t end = clock();
@@ -62,13 +61,13 @@ int main() {
 
 	//	Output result to console
 	std::cout << "\n\nFunction generated successfully in " << elapsed_secs << " CPU seconds" << std::endl;
-	std::cout << "Total Number of Generations: " << std::to_string((int)stats["Number Of Generations"]) << std::endl;
-	std::cout << "\nTotal Number of Inserts: " << std::to_string((int)stats["Number Of Inserts"]) << std::endl;
-	std::cout << "Total Number of Modifies: " << std::to_string((int)stats["Number Of Modifies"]) << std::endl;
-	std::cout << "Total Number of Deletes: " << std::to_string((int)stats["Number Of Deletes"]) << std::endl;
-	std::cout << "\nResult Number of Inserts: " << std::to_string((int)stats["Result Number Of Inserts"]) << std::endl;
-	std::cout << "Result Number of Modifies: " << std::to_string((int)stats["Result Number Of Modifies"]) << std::endl;
-	std::cout << "Result Number of Deletes: " << std::to_string((int)stats["Result Number Of Deletes"]) << std::endl;
+	std::cout << "Total Number of Generations: " << std::to_string((int)stats.at("Number Of Generations")) << std::endl;
+	std::cout << "\nTotal Number of Inserts: " << std::to_string((int)stats.at("Number Of Inserts")) << std::endl;
+	std::cout << "Total Number of Modifies: " << std::to_string((int)stats.at("Number Of Modifies")) << std::endl;
+	std::cout << "Total Number of Deletes: " << std::to_string((int)stats.at("Number Of Deletes")) << std::endl;
+	std::cout << "\nResult Number of Inserts: " << std::to_string((int)stats.at("Result Number Of Inserts")) << std::endl;
+	std::cout << "Result Number of Modifies: " << std::to_string((int)stats.at("Result Number Of Modifies")) << std::endl;
+	std::cout << "Result Number of Deletes: " << std::to_string((int)stats.at("Result Number Of Deletes")) << std::endl;
 	std::cout << "\nResult of  " << input << ": " << testFunction(compilePath, input) << std::endl;
 
 	//	Output general solution result
@@ -81,10 +80,10 @@ int main() {
 	//	Store output of process as a text file 
 	std::string processOutput = "\n";
 	processOutput += "Time taken: " + std::to_string(elapsed_secs) + " CPU seconds\n";
-	processOutput += "Number of Generations: " + std::to_string((int)stats["Number Of Generations"]) + '\n';
-	processOutput += "Number of Inserts: " + std::to_string((int)stats["Result Number Of Inserts"]) + '\n';
-	processOutput += "Number of Modifies: " + std::to_string((int)stats["Result Number Of Modifies"]) + '\n';
-	processOutput += "Number of Deletes: " + std::to_string((int)stats["Result Number Of Deletes"]) + '\n';
+	processOutput += "Number of Generations: " + std::to_string((int)stats.at("Number Of Generations")) + '\n';
+	processOutput += "Number of Inserts: " + std::to_string((int)stats.at("Result Number Of Inserts")) + '\n';
+	processOutput += "Number of Modifies: " + std::to_string((int)stats.at("Result Number Of Modifies")) + '\n';
+	processOutput += "Number of Deletes: " + std::to_string((int)stats.at("Result Number Of Deletes")) + '\n';
 	processOutput += function; 
 	appendDataFile(processOutput, "Resources/diagnostics.txt");
 
