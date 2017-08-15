@@ -35,7 +35,7 @@ GeneticTransform::GeneticTransform(std::vector<DanaLineSet> &initialPopulation, 
 /* - Private member functions - */
 
 int GeneticTransform::getRandomNumber(int low, int high) {
-	if (low == high)
+	if (low == high || high + low == 0)
 		return low;
 
 	high = (high - low) + 1;
@@ -47,7 +47,7 @@ std::string GeneticTransform::getVariableName(int lineNumber) {
 	return std::string(1, "abcdefghijklmnopqrstuvwxyz"[lineNumber - 1]);
 }
 
-std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std::vector<DanaVariable> &knownVariables) {
+std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, const std::vector<DanaVariable> &knownVariables) {
 	const std::vector<DanaVariable> vars = knownVariables;
 	std::vector<DanaLine> potentialLines = {};
 	std::vector<DanaFunction> validFunctions = {};
@@ -102,7 +102,7 @@ std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std
 			//	Generate a new potential line foreach possible array index
 			for (int i = 0; i < arr.size() - 1; i++) {
 				thisFunc.setMatchedParam(DanaVariable("x", "int", std::to_string(i)), 0);
-				DanaLine newLine = DanaLine(lineNumber - 1,
+				const DanaLine newLine = DanaLine(lineNumber - 1,
 					DanaVariable(getVariableName(lineNumber), arr.type), thisFunc);
 				potentialLines.push_back(newLine);
 			}
@@ -117,7 +117,7 @@ std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std
 
 			for (auto var : filteredVariables) {
 				thisFunc.setMatchedParam(var, 0);
-				DanaLine newLine = DanaLine(lineNumber - 1,
+				const DanaLine newLine = DanaLine(lineNumber - 1,
 					DanaVariable(getVariableName(lineNumber), thisFunc.returnType), thisFunc);
 				potentialLines.push_back(newLine);
 			}
@@ -134,7 +134,7 @@ std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std
 				for (auto var2 : filteredVariables) {
 					thisFunc.setMatchedParam(var1, 0);
 					thisFunc.setMatchedParam(var2, 1);
-					DanaLine newLine = DanaLine(lineNumber - 1,
+					const DanaLine newLine = DanaLine(lineNumber - 1,
 						DanaVariable(getVariableName(lineNumber), thisFunc.returnType), thisFunc);
 					potentialLines.push_back(newLine);
 				}
@@ -142,7 +142,6 @@ std::vector<DanaLine> GeneticTransform::getAllLineVariations(int lineNumber, std
 		}
 	}
 
-	validFunctions.clear();
 	return potentialLines;
 }
 
@@ -152,8 +151,8 @@ DanaLineSet GeneticTransform::correctVariableNames(DanaLineSet lnSet) {
 	for (int i = 0; i < newLineSet.numberOfLines(); i++) {
 		//	Store information about this current line
 		DanaLine currentLine = newLineSet.getLine(i);
-		DanaVariable currentLineVar = currentLine.getDeclaredVariable();
-		DanaFunction currrentLineFunc = currentLine.getFunctionCalled();
+		const DanaVariable currentLineVar = currentLine.getDeclaredVariable();
+		const DanaFunction currrentLineFunc = currentLine.getFunctionCalled();
 		const std::string correctNameForThisLine = getVariableName(i + 1);
 		const std::string currentName = currentLineVar.name;
 
@@ -168,9 +167,9 @@ DanaLineSet GeneticTransform::correctVariableNames(DanaLineSet lnSet) {
 		
 		//	If not - find and replace all instances
 		for (int j = i; j < newLineSet.numberOfLines(); j++) {
-			DanaLine checkLine = newLineSet.getLine(j);
-			DanaVariable checkVar = checkLine.getDeclaredVariable();
-			DanaFunction checkFunc = checkLine.getFunctionCalled();
+			const DanaLine checkLine = newLineSet.getLine(j);
+			const DanaVariable checkVar = checkLine.getDeclaredVariable();
+			const DanaFunction checkFunc = checkLine.getFunctionCalled();
 
 			//	Rename variable usage instances - for array assign function calls
 			if (checkFunc.isArrayAssign()) {
@@ -208,16 +207,16 @@ DanaLineSet GeneticTransform::correctVariableNames(DanaLineSet lnSet) {
 }
 
 std::string GeneticTransform::runSystemCommand(std::string command) {
-	//Execute system command and return result string
+	//	Execute system command and return result string
 	const std::shared_ptr<FILE> pipe(_popen(command.c_str(), "r"), _pclose);
 	std::array<char, 128> buffer;
 	std::string result;
 
-	//Check for early command fail
+	//	Check for early command fail
 	if (!pipe)
 		throw std::runtime_error("popen() failed!");
 
-	//Read data from pipe
+	//	Read data from pipe
 	while (!feof(pipe.get())) {
 		if (fgets(buffer.data(), 128, pipe.get()) != NULL)
 			result = result + buffer.data();
@@ -227,7 +226,7 @@ std::string GeneticTransform::runSystemCommand(std::string command) {
 }
 
 bool GeneticTransform::compileFunction(std::string path) {
-	//Try to compile new function
+	//	Try to compile new function
 	const std::string command = "dnc " + path;
 	const int response = system(command.c_str());
 
@@ -235,7 +234,7 @@ bool GeneticTransform::compileFunction(std::string path) {
 }
 
 bool GeneticTransform::testFunction(std::string path, std::string test, std::string expectedResult) {
-	//Test new function and compare with target
+	//	Test new function and compare with target
 	const std::string inputWithFormatting = "\"" + test + "\"";
 	const std::string command = "dana " + path + " " + inputWithFormatting;
 	const int response = system(command.c_str());
@@ -244,20 +243,24 @@ bool GeneticTransform::testFunction(std::string path, std::string test, std::str
 }
 
 void GeneticTransform::writeDataFile(std::string toWrite, std::string path) {
-	//Output generated file
+	//	Output generated file
 	std::ofstream generatedFile(path);
 	generatedFile << toWrite;
 	generatedFile.close();
 }
 
 std::string inline GeneticTransform::funcToString(DanaLineSet lnSet, std::string varToReturn) {
-	DanaLineSet currentFunction = lnSet;
+	const DanaLineSet currentFunction = lnSet;
 	const int numberOfLines = currentFunction.numberOfLines();
 
 	//	Compose function
 	std::vector<std::string> outFunction = functionHeader;
-	for (int j = 0; j < numberOfLines; j++) {
-		outFunction.push_back("\t\t" + currentFunction.getLine(j).composeLine());
+	for (int i = 0; i < numberOfLines; i++) {
+		const DanaLine currentLine = currentFunction.getLine(i);
+		const DanaVariable declaredVar = currentLine.getDeclaredVariable();
+		const DanaFunction calledFunction = currentLine.getFunctionCalled();
+
+		outFunction.push_back("\t\t" + currentLine.composeLine());
 	}
 
 	//	Add function footer
@@ -274,12 +277,12 @@ std::string inline GeneticTransform::funcToString(DanaLineSet lnSet, std::string
 }
 
 DanaVariable GeneticTransform::findReturnVariable(DanaLineSet lnSet) {
-	DanaLineSet currentFunction = lnSet;
+	const DanaLineSet currentFunction = lnSet;
 	const int numberOfLines = currentFunction.numberOfLines();
 
 	//	Look for the last defined integer to return
 	DanaVariable varToReturn = currentFunction.getLine(numberOfLines - 1).getDeclaredVariable();
-	std::vector<DanaVariable> vars = currentFunction.getAllVariables();
+	const std::vector<DanaVariable> vars = currentFunction.getAllVariables();
 	for (int j = (int)vars.size() - 1; j > -1; j--) {
 		if (vars.at(j).type == "int") {
 			varToReturn = vars.at(j);
@@ -295,15 +298,13 @@ DanaVariable GeneticTransform::findReturnVariable(DanaLineSet lnSet) {
 DanaLineSet GeneticTransform::insertLine(DanaLineSet lnSet) {
 	//	Get the variables of lnSet and select a newLineNumber for the line to be inserted
 	DanaLineSet newLineSet = lnSet;
-	std::vector<DanaVariable> scopedVars = newLineSet.getAllVariables();
+	const std::vector<DanaVariable> scopedVars = newLineSet.getAllVariables();
 	const int newLineNumber = newLineSet.numberOfLines() + 1;
 
 	//	Generate all possible new lines - select one randomly to add to the lineset
 	std::vector<DanaLine> possibleLines = getAllLineVariations(newLineNumber, scopedVars);
 	const int randomIndex = getRandomNumber(0, (int)(possibleLines.size() - 1));
 	newLineSet.insertLine(possibleLines.at(randomIndex));
-	scopedVars.clear();
-	possibleLines.clear();
 
 	return newLineSet;
 }
@@ -321,27 +322,25 @@ DanaLineSet GeneticTransform::modifyLine(DanaLineSet lnSet) {
 	//	Get function called on this line
 	DanaFunction functionCalled = lineToModify.getFunctionCalled();
 	std::vector<std::string> paramTypes;
-	for (int i = 0; i < functionCalled.numberOfParameters(); i++) {
+	for (int i = 0; i < functionCalled.numberOfParameters(); i++) 
 		paramTypes.push_back(functionCalled.getParameterType(i));
-	}
 
 	//	Change index if array assign
 	if (functionCalled.isArrayAssign()) {
-		DanaVariable declaredVariable = lineToModify.getDeclaredVariable();
-		DanaVariable arrayInCall = functionCalled.getFunctionObject();
+		const DanaVariable declaredVariable = lineToModify.getDeclaredVariable();
+		const DanaVariable arrayInCall = functionCalled.getFunctionObject();
 		DanaVariable index = functionCalled.getMatchedParameter(0);
 		index.setValue(std::to_string(getRandomNumber(0, arrayInCall.size() - 1)));
 		functionCalled.setMatchedParam(index, 0);
 
-		DanaLine newLine = DanaLine(lineNumber, declaredVariable, functionCalled);
-		newLineSet.insertLine(newLine);
+		newLineSet.insertLine(DanaLine(lineNumber, declaredVariable, functionCalled));
 		return newLineSet;
 	}
 
 	//	Change params for other inscope variables
-	std::vector<DanaVariable> inscope = newLineSet.variablesInScope(lineToModify.getLineNumber());
+	const std::vector<DanaVariable> inscope = newLineSet.variablesInScope(lineToModify.getLineNumber());
 	for (int i = 0; i < paramTypes.size(); i++) {
-		std::string param = paramTypes.at(i);
+		const std::string param = paramTypes.at(i);
 		std::vector<DanaVariable> filteredParams = inscope;
 		filteredParams.erase(std::remove_if(filteredParams.begin(), filteredParams.end(),
 			[param](DanaVariable v) { return v.type != param; }), filteredParams.end());
@@ -349,8 +348,7 @@ DanaLineSet GeneticTransform::modifyLine(DanaLineSet lnSet) {
 		functionCalled.setMatchedParam(filteredParams.at(getRandomNumber(0, (int)filteredParams.size() - 1)), i);
 	}
 
-	DanaLine newLine = DanaLine(lineNumber, lineToModify.getDeclaredVariable(), functionCalled);
-	newLineSet.insertLine(newLine);
+	newLineSet.insertLine(DanaLine(lineNumber, lineToModify.getDeclaredVariable(), functionCalled));
 	return newLineSet;
 }
 
@@ -365,8 +363,8 @@ DanaLineSet GeneticTransform::deleteLine(DanaLineSet lnSet) {
 	if (deleteIndex == 0)
 		return lnSet;
 
-	DanaLine lineToDelete = newLineSet.getLine(deleteIndex);
-	DanaVariable variableToRemove = lineToDelete.getDeclaredVariable();
+	const DanaLine lineToDelete = newLineSet.getLine(deleteIndex);
+	const DanaVariable variableToRemove = lineToDelete.getDeclaredVariable();
 	std::vector<int> usagesOfVariable = newLineSet.findVariableUsages(variableToRemove);
 	
 	//	If var declared on the deleted line is used nowhere else 
@@ -385,7 +383,7 @@ DanaLineSet GeneticTransform::deleteLine(DanaLineSet lnSet) {
 DanaLineSet GeneticTransform::crossover(const DanaLineSet &one, const DanaLineSet &other) {
 	//	Store passed class info
 	DanaLineSet current = DanaLineSet(one);
-	DanaLineSet passedLineSet = DanaLineSet(other);
+	const DanaLineSet passedLineSet = DanaLineSet(other);
 
 	//	If there are to few lines for a crossover - do an early return and force GA to insert a line
 	if (passedLineSet.numberOfLines() < 2 || current.numberOfLines() < 2) 
@@ -394,22 +392,21 @@ DanaLineSet GeneticTransform::crossover(const DanaLineSet &one, const DanaLineSe
 	//	Select a random line from the other lineset
 	const int passedNumberOfLines = passedLineSet.numberOfLines();
 	const int randomPassedLineIndex = getRandomNumber(1, passedNumberOfLines - 1);
-	DanaLine passedLine = passedLineSet.getLine(randomPassedLineIndex);
+	const DanaLine passedLine = passedLineSet.getLine(randomPassedLineIndex);
 
-	DanaFunction calledFunc = passedLine.getFunctionCalled();
-	DanaVariable declaredVar = passedLine.getDeclaredVariable();
+	const DanaFunction calledFunc = passedLine.getFunctionCalled();
+	const DanaVariable declaredVar = passedLine.getDeclaredVariable();
 
 	//	If is array assign - copy index that other lineset used
 	if (calledFunc.isArrayAssign()) {
-		DanaVariable index = calledFunc.getMatchedParameter(0);
+		const DanaVariable index = calledFunc.getMatchedParameter(0);
 
 		//	Find the last array assign in current - replace the index used 
 		for (int i = current.numberOfLines() - 1; i > -1; i--) {
 			if (current.getLine(i).getFunctionCalled().isArrayAssign() && i > 0) {
 				DanaFunction replaceFunc = DanaFunction(current.getLine(i).getFunctionCalled().getFunctionObject());
 				replaceFunc.setMatchedParam(index, 0);
-				DanaLine replacementLine = DanaLine(i, current.getLine(i).getDeclaredVariable(), replaceFunc);
-				current.insertLine(replacementLine);
+				current.insertLine(DanaLine(i, current.getLine(i).getDeclaredVariable(), replaceFunc));
 				return current;
 			}
 		}
@@ -421,28 +418,33 @@ DanaLineSet GeneticTransform::crossover(const DanaLineSet &one, const DanaLineSe
 	return current;
 }
 
-DanaLineSet GeneticTransform::removeUnnecessaryLines(DanaLineSet lnSet, DanaVariable returnVar) {
+DanaLineSet GeneticTransform::removeUnnecessaryLines(DanaLineSet lnSet, DanaVariable returnVar, bool repeatCheck) {
 	DanaLineSet newLineSet = lnSet;
-	DanaVariable varToReturn = returnVar;
+	const DanaVariable varToReturn = returnVar;
 
 	//	Look for lines whom declare vars that are used nowhere else
 	for (int i = 0; i < newLineSet.numberOfLines(); i++) {
-		DanaLine currentLine = newLineSet.getLine(i);
-		DanaVariable declaredVar = currentLine.getDeclaredVariable();
+		const DanaLine currentLine = newLineSet.getLine(i);
+		const DanaVariable declaredVar = currentLine.getDeclaredVariable();
 		const int varUsages = (int)newLineSet.findVariableUsages(declaredVar).size();
 
 		//	If var is used nowhere else and is not the return var - Delete the line
-		if (varUsages == 0 && declaredVar.name != varToReturn.name)
-			newLineSet.deleteLine(i);
+		if (varUsages == 0 && declaredVar.name != varToReturn.name) {
+			newLineSet.safeDelete({ i });
+			i--;
+		}
 	}
-	
+
+	if (repeatCheck)
+		newLineSet = removeUnnecessaryLines(newLineSet, varToReturn, false);
+
 	return correctVariableNames(newLineSet);
 }
 
 void GeneticTransform::test() {	
 	for (int i = 0; i < populaton.size(); i++) {
 		//	Store current function and set score to 0 initially 
-		DanaLineSet currentFunction = populaton.at(i).first;
+		const DanaLineSet currentFunction = populaton.at(i).first;
 		double score = 0;
 		bool returnInt = false;
 
@@ -467,7 +469,7 @@ void GeneticTransform::test() {
 		const int numberOfFunctions = (int)knownFunctions.size();
 		std::vector<std::string> usedFunctions;
 		for (int j = 0; j < numberOfLines; j++) {
-			DanaFunction funcUsedOnThisLine = currentFunction.getLine(j).getFunctionCalled();
+			const DanaFunction funcUsedOnThisLine = currentFunction.getLine(j).getFunctionCalled();
 			if (std::find(usedFunctions.begin(), usedFunctions.end(),
 				funcUsedOnThisLine.name + std::to_string(funcUsedOnThisLine.isArrayAssign())) == usedFunctions.end()) {
 				usedFunctions.push_back(funcUsedOnThisLine.name + std::to_string(funcUsedOnThisLine.isArrayAssign()));
@@ -482,7 +484,7 @@ void GeneticTransform::test() {
 		}
 
 		//	Find the variable to return from the function
-		DanaVariable varToReturn = findReturnVariable(currentFunction);
+		const DanaVariable varToReturn = findReturnVariable(currentFunction);
 
 		//	Compile and test function
 		const std::string function = funcToString(currentFunction, varToReturn.name);
@@ -490,11 +492,7 @@ void GeneticTransform::test() {
 		if (compileFunction(outputPath)) {
 			if (testFunction(compilePath, input, target)) {
 				score += 5; 
-
-				//	Strip unnecessary lines from the function
-				DanaLineSet prunedFunc = removeUnnecessaryLines(currentFunction, varToReturn);
-				varToReturn = findReturnVariable(prunedFunc);
-				resultFunction = funcToString(prunedFunc, varToReturn.name);
+				resultFunction = populaton.at(i);
 			}
 		}
 
@@ -515,12 +513,14 @@ void GeneticTransform::rank() {
 }
 
 std::string GeneticTransform::cycleGeneration() {
-	stats.clear();
-	int numberOfGenerations = 0;
+	int totalNumberOfGenerations = 0;
+	int totalNumberOfInserts = 0;
+	int totalNumberOfModifies = 0;
+	int totalNumberOfDeletes = 0;
 
 	//	Loop until a result function is found
-	while (resultFunction == "") {
-		if (numberOfGenerations > 0) {
+	while (resultFunction.first.numberOfLines() == 0) {
+		if (totalNumberOfGenerations > 0) {
 			test();
 			rank();
 			
@@ -535,28 +535,44 @@ std::string GeneticTransform::cycleGeneration() {
 			const int whichMutation = getRandomNumber(0, 2);
 			switch (getRandomNumber(0, 2)) {
 			case 0:
+				totalNumberOfInserts++;
+				populaton.at(i).first.numberOfInserts++;
 				populaton.at(i).first = insertLine(populaton.at(i).first);
 				break;
 			case 1:
+				totalNumberOfDeletes++;
+				populaton.at(i).first.numberOfDeletes++;
 				populaton.at(i).first = deleteLine(populaton.at(i).first);
 				break;
 			default:
+				totalNumberOfModifies++;
+				populaton.at(i).first.numberOfModifies++;
 				populaton.at(i).first = modifyLine(populaton.at(i).first);
 				break;
 			}
 		}
 
-		numberOfGenerations++;
+		totalNumberOfGenerations++;
 	}
 
+	//	Prepare function for output
+	const DanaLineSet prunedFunc = removeUnnecessaryLines(resultFunction.first, findReturnVariable(resultFunction.first), true);
+	const std::string func = funcToString(prunedFunc, findReturnVariable(prunedFunc).name);
+
 	//	Write result function to file so it can be tested by the client 
-	writeDataFile(resultFunction, outputPath);
+	writeDataFile(func, outputPath);
 	compileFunction(outputPath);
 
 	//	Compose stats
-	stats["Number Of Generations"] = numberOfGenerations;
+	stats["Number Of Generations"] = totalNumberOfGenerations;
+	stats["Number Of Inserts"] = totalNumberOfInserts;
+	stats["Number Of Deletes"] = totalNumberOfDeletes;
+	stats["Number Of Modifies"] = totalNumberOfModifies;
+	stats["Result Number Of Inserts"] = resultFunction.first.numberOfInserts;
+	stats["Result Number Of Modifies"] = resultFunction.first.numberOfModifies;
+	stats["Result Number Of Deletes"] = resultFunction.first.numberOfDeletes;
 
-	return resultFunction;
+	return func;
 }
 
 std::vector<std::pair<DanaLineSet, double>> GeneticTransform::getPopulation() {
@@ -565,13 +581,4 @@ std::vector<std::pair<DanaLineSet, double>> GeneticTransform::getPopulation() {
 
 std::map<std::string, double> GeneticTransform::getLastCycleStats() {
 	return stats;
-}
-
-/* - Destructor - */
-
-GeneticTransform::~GeneticTransform() {
-	knownFunctions.clear();
-	functionHeader.clear();
-	stats.clear();
-	populaton.clear();
 }

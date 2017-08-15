@@ -41,26 +41,26 @@ public:
 		value = newValue;
 	}
 
-	std::string getValue() {
+	std::string getValue() const {
 		return value;
 	}
 
-	std::string composeVariable() {
+	std::string composeVariable() const {
 		if (array)
 			return type + " " + name + " [] ";
 
 		return type + " " + name;
 	}
 
-	int size() {
+	int size() const {
 		return arraySize;
 	}
 
-	bool isArray() {
+	bool isArray() const {
 		return array;
 	}
 
-	bool DanaVariable::operator==(const DanaVariable& dv) {
+	bool DanaVariable::operator==(const DanaVariable& dv) const {
 		return name == dv.name && type == dv.type;
 	}
 };

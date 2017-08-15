@@ -4,6 +4,8 @@
 #include "DanaFunction.h"
 #include "DanaVariable.h"
 
+/* --- Class to store declared variable and function called for a Dana line --- */
+
 class DanaLine {
 private:
 	int lineNumber;
@@ -28,7 +30,7 @@ public:
 		functionCalled = newFunction;
 	}
 
-	int getLineNumber() {
+	int getLineNumber() const {
 		return lineNumber;
 	}
 
@@ -36,15 +38,15 @@ public:
 		lineNumber = newNumber;
 	}
 
-	DanaVariable getDeclaredVariable() {
+	DanaVariable getDeclaredVariable() const {
 		return declaredVariable;
 	}
 
-	DanaFunction getFunctionCalled() {
+	DanaFunction getFunctionCalled() const {
 		return functionCalled;
 	}
 
-	std::vector<DanaVariable> getFunctionParameters() {
+	std::vector<DanaVariable> getFunctionParameters() const {
 		std::vector<DanaVariable> result;
 
 		for (int i = 0; i < functionCalled.numberOfParameters(); i++) 
@@ -53,13 +55,12 @@ public:
 		return result;
 	}
 
-	std::string composeLine() {
-		return declaredVariable.composeVariable() + " = " + functionCalled.composeFunctionCall();
+	std::string composeLine() const {
+		return getDeclaredVariable().composeVariable() + " = " + functionCalled.composeFunctionCall();
 	}
 
-	bool operator==(const DanaLine& dl) {
-		DanaLine check = dl;
-		return check.composeLine() == composeLine();
+	bool operator==(const DanaLine& dl) const {
+		return dl.composeLine() == composeLine();
 	}
 };
 

@@ -5,14 +5,28 @@
 #include "DanaFunction.h"
 #include "DanaVariable.h"
 
+/* --- Class to store and maninpulate mulitple Dana lines --- */
+
 class DanaLineSet {
 private:
 	std::vector<DanaLine> lines;
 
 public:
-	DanaLineSet() {}
+	int numberOfInserts;
+	int numberOfModifies;
+	int numberOfDeletes;
 
-	int numberOfLines() {
+	DanaLineSet() {
+		numberOfInserts = 0;
+		numberOfModifies = 0;
+		numberOfDeletes = 0;
+	}
+
+	DanaLineSet(DanaLine initialLine) {
+		lines = { initialLine };
+	}
+
+	int numberOfLines() const {
 		return (int)lines.size();
 	}
 
@@ -42,7 +56,6 @@ public:
 		std::vector<int> nextLinesToDelete;
 
 		for (auto index : linesToDelete) {
-			//	Get line (and declared var) to delete from vector of lines
 			DanaLine toDelete;
 			DanaVariable varToDelete;
 			for (auto checkLine : lines) {
@@ -52,8 +65,7 @@ public:
 				}
 			}			
 
-			//	Check for dependencies on other lines
-			std::vector<int> usages = findVariableUsages(varToDelete);
+			const std::vector<int> usages = findVariableUsages(varToDelete);
 			for (auto thisUsage : usages) {
 				if (!(std::find(nextLinesToDelete.begin(), nextLinesToDelete.end(),
 					thisUsage) != nextLinesToDelete.end())) {
@@ -61,23 +73,20 @@ public:
 				}
 			}
 
-			//	Remove line
 			lines.erase(std::remove(lines.begin(), lines.end(), toDelete), lines.end());
 		}
 
 		if (nextLinesToDelete.size() == 0) {
-			//	Reset line numbers after delete
 			for (int i = 0; i < lines.size(); i++) 
 				lines.at(i).setLineNumber(i);
 
 			return;
 		}
 		
-		//	There are more lines to delete - make recurisve call
 		safeDelete(nextLinesToDelete);
 	}
 
-	DanaLine getLine(int lineNumber) {
+	DanaLine getLine(int lineNumber) const {
 		if (lineNumber < 0 || lineNumber > (numberOfLines() - 1)) {
 			const std::string errorMessage = "Invalid line number " + lineNumber;
 			throw std::exception(errorMessage.c_str());
@@ -86,7 +95,7 @@ public:
 		return lines.at(lineNumber);
 	}
 
-	std::vector<DanaVariable> getAllVariables() {
+	std::vector<DanaVariable> getAllVariables() const {
 		std::vector<DanaVariable> result;
 
 		for (auto i : lines)
@@ -95,7 +104,7 @@ public:
 		return result;
 	}
 
-	std::vector<DanaVariable> variablesInScope(int line) {
+	std::vector<DanaVariable> variablesInScope(int line) const {
 		std::vector<DanaVariable> result = {};
 
 		for (int i = 0; i < line; i++) 
@@ -104,13 +113,13 @@ public:
 		return result;
 	}
 
-	std::vector<int> findVariableUsages(DanaVariable var) {
+	std::vector<int> findVariableUsages(DanaVariable var) const {
 		std::vector<int> result = {};
 
 		for (auto i : lines) {
 			const std::vector<DanaVariable> paramsUsedAtLine = i.getFunctionParameters();
 			bool varUsedAtThisLine = false;
-			DanaFunction funcAtThisLine = i.getFunctionCalled();
+			const DanaFunction funcAtThisLine = i.getFunctionCalled();
 
 			if (funcAtThisLine.isArrayAssign() && funcAtThisLine.getFunctionObject() == var) {
 				result.push_back(i.getLineNumber());
@@ -129,7 +138,7 @@ public:
 		return result;
 	}
 
-	std::vector<int> findFunctionInstances(DanaFunction func) {
+	std::vector<int> findFunctionInstances(DanaFunction func) const {
 		std::vector<int> result = {};
 
 		for (auto i : lines) {
@@ -142,15 +151,14 @@ public:
 		return result;
 	}
 
-	bool validateLines() {
+	bool validateLines() const {
 		bool linesAreValid = true;
-		std::vector<DanaVariable> allVariables = getAllVariables();
+		const std::vector<DanaVariable> allVariables = getAllVariables();
 
 		for (int i = 0; i < numberOfLines(); i++) {
-
-			std::vector<DanaVariable> currentlyInScope = variablesInScope(i);
-			std::vector<DanaVariable> parametersUsed = lines.at(i).getFunctionParameters();
-			DanaVariable declaredOnThisLine = lines.at(i).getDeclaredVariable();
+			const std::vector<DanaVariable> currentlyInScope = variablesInScope(i);
+			const std::vector<DanaVariable> parametersUsed = lines.at(i).getFunctionParameters();
+			const DanaVariable declaredOnThisLine = lines.at(i).getDeclaredVariable();
 
 			if (std::count(allVariables.begin(), allVariables.end(), declaredOnThisLine) > 1)
 				linesAreValid = false;
@@ -166,7 +174,7 @@ public:
 		return linesAreValid;
 	}
 	
-	std::string composeLines() {
+	std::string composeLines() const {
 		std::string result;
 
 		for (auto i : lines)

@@ -59,7 +59,7 @@ public:
 			returnType = danaArray.type;
 	}
 
-	DanaFunction(DanaVariable danaArray, std::string modifier){
+	DanaFunction(DanaVariable danaArray, std::string modifier) {
 		requiredParams = { "int" };
 		matchedParams = { DanaVariable() };
 		arrayAssign = true;
@@ -68,15 +68,15 @@ public:
 		functionObject = danaArray;
 	}
 
-	DanaVariable getMatchedParameter(int index) {
+	DanaVariable getMatchedParameter(int index) const {
 		return matchedParams.at(index);
 	}
 
-	std::string getParameterType(int index) {
+	std::string getParameterType(int index) const {
 		return requiredParams.at(index);
 	}
 
-	DanaVariable getFunctionObject() {
+	DanaVariable getFunctionObject() const {
 		return functionObject;
 	}
 
@@ -102,9 +102,9 @@ public:
 			i = DanaVariable();
 	}
 
-	std::string composeFunctionCall() {
+	std::string composeFunctionCall() const {
 		if (isArrayAssign()) {
-			std::string paramValue = matchedParams.at(0).getValue();
+			std::string paramValue = getMatchedParameter(0).getValue();
 			std::string outVal = paramValue.size() > 0 ? paramValue : matchedParams.at(0).name;
 			return functionObject.name + " [ " + outVal + " ]" + assignmentModifier;
 		}
@@ -124,24 +124,19 @@ public:
 		return call += " )";
 	}
 
-	int numberOfParameters() {
+	int numberOfParameters() const {
 		return (int)requiredParams.size();
 	}
 
-	bool isInfix() {
+	bool isInfix() const {
 		return infix;
 	}
 
-	bool isArrayAssign() {
+	bool isArrayAssign() const {
 		return arrayAssign;
 	}
 
-	bool operator==(const DanaFunction& df) {
+	bool operator==(const DanaFunction& df) const {
 		return (name == df.name && returnType == df.returnType && arrayAssign == df.arrayAssign);
-	}
-
-	~DanaFunction() {
-		matchedParams.clear();
-		requiredParams.clear();
 	}
 };

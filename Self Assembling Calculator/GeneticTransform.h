@@ -24,14 +24,14 @@ private:
 	std::map<std::string, double> stats;
 	std::string input;
 	std::string target;
-	std::string resultFunction;
+	std::pair<DanaLineSet, double> resultFunction;
 	const std::string outputPath = "Resources/calculator.dn";
 	const std::string compilePath = "Resources/calculator.o";
 
 	//	Private member functions
 	int getRandomNumber(int, int);
 	std::string getVariableName(int lineNumber);
-	std::vector<DanaLine> getAllLineVariations(int, std::vector<DanaVariable> &);
+	std::vector<DanaLine> getAllLineVariations(int, const std::vector<DanaVariable> &);
 	DanaLineSet correctVariableNames(DanaLineSet);
 	std::string runSystemCommand(std::string);
 	bool compileFunction(std::string);
@@ -50,14 +50,11 @@ public:
 	DanaLineSet modifyLine(DanaLineSet); 
 	DanaLineSet deleteLine(DanaLineSet);  
 	DanaLineSet crossover(const DanaLineSet &, const DanaLineSet &);
-	DanaLineSet removeUnnecessaryLines(DanaLineSet, DanaVariable);
+	DanaLineSet removeUnnecessaryLines(DanaLineSet, DanaVariable, bool);
 	void test();
 	void rank();
 	std::string cycleGeneration();
 	std::vector<std::pair<DanaLineSet, double>> getPopulation();
 	std::map<std::string, double> getLastCycleStats();
-
-	// Destructor 
-	~GeneticTransform();
 };
 
