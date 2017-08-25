@@ -16,7 +16,7 @@ void appendDataFile(std::string, std::string);
 int testFunction(std::string, std::string);
 bool shouldRunAgain();
 
-int main() {
+int main() {	
 	//	Read input and target data
 	std::cout << " - Input Data - " << std::endl;
 	const std::string input = readDataFile("Input file not found, try again");
@@ -35,22 +35,47 @@ int main() {
 	primaryFunctionCall.setMatchedParam(DanaVariable("x", "int", std::to_string(0)), 0);
 	const DanaLine primaryLine = DanaLine(0, DanaVariable("a", "char", 5), primaryFunctionCall);
 
-	//	Initialise the primary population
-	std::vector<DanaLineSet> population;
-	for (int i = 0; i < 10; i++)
-		population.push_back(DanaLineSet(primaryLine));
-
-	//	Loop until solution can be found
+	//	Initialise variables for generation cycle
 	const std::string outputPath = "Resources/calculator.dn";
 	const std::string compilePath = "Resources/calculator.o";
 	std::string resultFunction = "";
 	std::string function;
 	bool solutionFound = false;
 
-	//	Start thread to generate new functions
+	//	Initialise the primary population
+	std::vector<DanaLineSet> population;
+	for (int i = 0; i < 10; i++)
+		population.push_back(DanaLineSet(primaryLine));
+
+	//	Read previous generation statistics to tune GA fitness function
+	const std::string genInfoFile = "Resources/genInfo.txt";
+	double averageStats = 0;
+	std::vector<std::string> previousGenertationStats;
+	std::ifstream inFile;
+	inFile.open(genInfoFile);
+	if (inFile.is_open()) {
+		std::string line;
+
+		//	Read in file - save values into vector
+		while (inFile >> line) {
+			previousGenertationStats.push_back(line);
+		}
+
+		//	Calculate the average of the values in the vector
+		for (auto i : previousGenertationStats) {
+			averageStats += std::stoi(i);
+		}
+		averageStats /= previousGenertationStats.size();
+
+		inFile.close();
+	}
+
+	//	Start clock to record time taken
 	clock_t begin = clock();
 
+	//	Begin generation
 	GeneticTransform GA = GeneticTransform(population, newFunctions, requires, input, target);
+	averageStats != 0 ? GA.tuneFitnessFunction("LENGTH", averageStats) : NULL;
 	function = GA.cycleGeneration();
 	const std::vector<std::pair<DanaLineSet, double>> resultPopulation = GA.getPopulation();
 	const std::map<std::string, double> stats = GA.getLastCycleStats();
@@ -86,6 +111,7 @@ int main() {
 	processOutput += "Number of Deletes: " + std::to_string((int)stats.at("Result Number Of Deletes")) + '\n';
 	processOutput += function; 
 	appendDataFile(processOutput, "Resources/diagnostics.txt");
+	appendDataFile(std::to_string((int)stats.at("Length Of Result Component")) + "\n", "Resources/genInfo.txt");
 
 	if (shouldRunAgain())
 		main();

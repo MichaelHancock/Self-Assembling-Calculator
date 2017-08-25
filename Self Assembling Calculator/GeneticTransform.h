@@ -25,6 +25,7 @@ private:
 	std::string input;
 	std::string target;
 	std::pair<DanaLineSet, double> resultFunction;
+	double targetComponentLength = 6;
 	const std::string outputPath = "Resources/calculator.dn";
 	const std::string compilePath = "Resources/calculator.o";
 
@@ -56,5 +57,6 @@ public:
 	std::string cycleGeneration();
 	std::vector<std::pair<DanaLineSet, double>> getPopulation();
 	std::map<std::string, double> getLastCycleStats();
+	void tuneFitnessFunction(const std::string, double);
 };
 

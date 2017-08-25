@@ -461,8 +461,7 @@ void GeneticTransform::test() {
 		}
 
 		//	How many lines does the function have
-		const int bestNumberOfLines = 6;
-		const int distance = abs(bestNumberOfLines - numberOfLines);
+		const double distance = abs(targetComponentLength - numberOfLines);
 		score = distance == 0 ? score += 2 : score += ((double)1 / distance);
 
 		//	How many functions does the function use
@@ -558,12 +557,14 @@ std::string GeneticTransform::cycleGeneration() {
 	//	Prepare function for output
 	const DanaLineSet prunedFunc = removeUnnecessaryLines(resultFunction.first, findReturnVariable(resultFunction.first), true);
 	const std::string func = funcToString(prunedFunc, findReturnVariable(prunedFunc).name);
+	const int lengthBeforePrune = resultFunction.first.numberOfLines();
 
 	//	Write result function to file so it can be tested by the client 
 	writeDataFile(func, outputPath);
 	compileFunction(outputPath);
 
 	//	Compose stats
+	stats["Length Of Result Component"] = lengthBeforePrune;
 	stats["Number Of Generations"] = totalNumberOfGenerations;
 	stats["Number Of Inserts"] = totalNumberOfInserts;
 	stats["Number Of Deletes"] = totalNumberOfDeletes;
@@ -581,4 +582,10 @@ std::vector<std::pair<DanaLineSet, double>> GeneticTransform::getPopulation() {
 
 std::map<std::string, double> GeneticTransform::getLastCycleStats() {
 	return stats;
+}
+
+void GeneticTransform::tuneFitnessFunction(const std::string aspect, double value) {
+	if (aspect == "LENGTH") {
+		targetComponentLength = value;
+	}
 }
