@@ -14,14 +14,14 @@ typedef std::vector<pairOfStrings> vectorOfPairs;
 class DanaGrammer
 {
 public:
-	//Constructors
+	//	Constructors
 	DanaGrammer(std::string, std::vector<DanaVariable>);
 
-	//Public member functions
+	//	Public member functions
 	std::string nextLine(int, int, std::string);
 private:
 
-	//Private member functions
+	//	Private member functions
 	int getRandomNumber(int, int);
 	vectorOfPairs splitStringIntoPairs(std::string, const char *);
 	std::string generateType();
@@ -30,7 +30,7 @@ private:
 	std::string getMatchingParam(std::string);
 	pairOfStrings assignFromArray();
 
-	//Private member variables
+	//	Private member variables
 	vectorOfPairs availableFunctions;
 	std::vector<DanaVariable> availableVariables;
 };
